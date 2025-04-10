@@ -1,0 +1,10 @@
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\Application.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\config\MappersConfig.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\config\SpringDocConfig.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\controllers\DummyController.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\dtos\DummyDto.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\entities\DummyEntity.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\models\Dummy.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\repositories\DummyRepository.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\services\DummyService.java
+C:\Users\marti\OneDrive\Escritorio\Initial-Scaffolding-Java-main\src\main\java\com\scaffold\template\services\impl\DummyServiceImpl.java

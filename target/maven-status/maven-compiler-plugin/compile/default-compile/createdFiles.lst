@@ -1,0 +1,10 @@
+com\scaffold\template\dtos\DummyDto.class
+com\scaffold\template\Application.class
+com\scaffold\template\config\MappersConfig.class
+com\scaffold\template\controllers\DummyController.class
+com\scaffold\template\services\DummyService.class
+com\scaffold\template\config\SpringDocConfig.class
+com\scaffold\template\repositories\DummyRepository.class
+com\scaffold\template\entities\DummyEntity.class
+com\scaffold\template\models\Dummy.class
+com\scaffold\template\services\impl\DummyServiceImpl.class
