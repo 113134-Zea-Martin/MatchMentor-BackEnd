@@ -1,6 +1,7 @@
 package com.scaffold.template.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -9,6 +10,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Esta clase implementa la interfaz {@link WebMvcConfigurer} para proporcionar configuraciones específicas.
  */
 @Configuration
+@EnableAsync
 public class WebConfig implements WebMvcConfigurer {
 
     /**

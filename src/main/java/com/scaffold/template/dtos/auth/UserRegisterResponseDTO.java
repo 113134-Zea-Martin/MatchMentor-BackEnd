@@ -1,4 +1,4 @@
-package com.scaffold.template.dtos;
+package com.scaffold.template.dtos.auth;
 
 import lombok.Data;
 

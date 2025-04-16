@@ -1,7 +1,7 @@
 package com.scaffold.template.services.mappers;
 
-import com.scaffold.template.dtos.UserRegisterRequestDTO;
-import com.scaffold.template.dtos.UserRegisterResponseDTO;
+import com.scaffold.template.dtos.auth.UserRegisterRequestDTO;
+import com.scaffold.template.dtos.auth.UserRegisterResponseDTO;
 import com.scaffold.template.entities.UserEntity;
 import org.springframework.stereotype.Component;
 
