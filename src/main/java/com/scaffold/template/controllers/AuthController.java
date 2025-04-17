@@ -58,8 +58,23 @@ public class AuthController {
      * @return Una respuesta HTTP con la lista de todos los usuarios.
      */
     @GetMapping("/users")
-    public ResponseEntity<List<UserEntity>> getAllUsers() {
-        return ResponseEntity.ok(authService.getAllUsers());
+    public ResponseEntity<ApiResponse> getAllUsers() {
+        ApiResponse response = new ApiResponse();
+        response.setTimestamp(LocalDateTime.now());
+
+        try {
+            List<UserEntity> users = authService.getAllUsers();
+            response.setSuccess(true);
+            response.setStatusCode(200);
+            response.setData(users);
+            response.setMessage("Usuarios obtenidos correctamente");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al obtener los usuarios: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
     }
 
     /**
@@ -72,10 +87,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse> register(@Valid @RequestBody UserRegisterRequestDTO userRegisterRequestDTO) {
         ApiResponse response = new ApiResponse();
         response.setTimestamp(LocalDateTime.now());
+
         try {
             UserEntity userEntity = authService.registerUser(userRegisterRequestDTO);
             UserRegisterResponseDTO userRegisterResponseDTO = UserMapper.toResponseDTO(userEntity);
+
             response.setSuccess(true);
+            response.setStatusCode(201);
             response.setData(userRegisterResponseDTO);
             response.setMessage("Usuario registrado correctamente");
 
@@ -83,10 +101,16 @@ public class AuthController {
             emailService.sendSuccessfulRegistrationEmail(userRegisterRequestDTO);
 
             return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            response.setSuccess(false);
+            response.setStatusCode(400);
+            response.setMessage(e.getMessage());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.setSuccess(false);
-            response.setMessage(e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            response.setStatusCode(500);
+            response.setMessage("Error interno al registrar usuario: " + e.getMessage());
+            return ResponseEntity.ok(response);
         }
     }
 
@@ -100,60 +124,87 @@ public class AuthController {
 
             if (!loginResponseDTO.isActive()) {
                 response.setSuccess(false);
+                response.setStatusCode(403);
                 response.setMessage("Usuario inactivo");
-                return ResponseEntity.badRequest().body(response);
+                return ResponseEntity.ok(response);
             }
 
             response.setSuccess(true);
+            response.setStatusCode(200);
             response.setData(loginResponseDTO);
             response.setMessage("Login exitoso");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             response.setSuccess(false);
+            response.setStatusCode(401);
             response.setMessage("Credenciales inválidas");
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.ok(response);
         }
     }
 
     @PostMapping("/request-reset")
     public ResponseEntity<ApiResponse> requestReset(@RequestParam String email) {
-        UserEntity user = authService.getUserByEmail(email);
         ApiResponse response = new ApiResponse();
         response.setTimestamp(LocalDateTime.now());
 
-        if (user == null) {
+        try {
+            UserEntity user = authService.getUserByEmail(email);
+
+            String token = passwordResetTokenService.createTokenForUser(user);
+            String resetLink = frontendUrl + "/auth/reset-password?token=" + token;
+            String subject = "Restablecimiento de contraseña";
+            String body = "Hola " + user.getFirstName() + ",\n\n" +
+                    "Hemos recibido una solicitud para restablecer tu contraseña.\n" +
+                    "Haz clic en el siguiente enlace para restablecerla:\n" +
+                    resetLink + "\n\n" +
+                    "Si no solicitaste este cambio, ignora este correo.\n\n" +
+                    "Saludos,\nEl equipo de Mentor Match";
+            emailService.sendMail(email, subject, body);
+
+            response.setStatusCode(200);
+            response.setData(token);
+            response.setSuccess(true);
+            response.setMessage("Se ha enviado un correo electrónico con el enlace para restablecer la contraseña");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
             response.setSuccess(false);
-            response.setMessage("El correo electrónico no está registrado");
-            return ResponseEntity.status(404).body(response);
+            response.setStatusCode(404);
+            response.setMessage(e.getMessage());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al procesar la solicitud: " + e.getMessage());
+            return ResponseEntity.ok(response);
         }
-
-        String token = passwordResetTokenService.createTokenForUser(user);
-
-//        String resetLink = "http://localhost:8080/api/auth/reset-password?token=" + token;
-        String resetLink = frontendUrl + "/reset-password?token=" + token;
-        String subject = "Restablecimiento de contraseña";
-        String body = "Hola " + user.getFirstName() + ",\n\n" +
-                "Hemos recibido una solicitud para restablecer tu contraseña.\n" +
-                "Haz clic en el siguiente enlace para restablecerla:\n" +
-                resetLink + "\n\n" +
-                "Si no solicitaste este cambio, ignora este correo.\n\n" +
-                "Saludos,\nEl equipo de Mentor Match";
-        emailService.sendMail(email, subject, body);
-        response.setData(token);
-        response.setSuccess(true);
-        response.setMessage("Se ha enviado un correo electrónico con el enlace para restablecer la contraseña");
-        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse> resetPassword(@RequestBody PasswordResetRequestDTO resetRequest) {
         ApiResponse response = new ApiResponse();
         response.setTimestamp(LocalDateTime.now());
 
-        boolean success = passwordResetTokenService.resetPassword(resetRequest.getToken(), resetRequest.getNewPassword());
-        response.setSuccess(success);
-        response.setMessage(success ? "Contraseña restablecida correctamente" : "Token inválido o expirado");
-        return ResponseEntity.ok(response);
+        try {
+            boolean success = passwordResetTokenService.resetPassword(resetRequest.getToken(), resetRequest.getNewPassword());
+
+            if (success) {
+                response.setSuccess(true);
+                response.setStatusCode(200);
+                response.setMessage("Contraseña restablecida correctamente");
+            } else {
+                response.setSuccess(false);
+                response.setStatusCode(400);
+                response.setMessage("Token inválido o expirado");
+            }
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al restablecer la contraseña: " + e.getMessage());
+            return ResponseEntity.ok(response);
+        }
     }
 
 }

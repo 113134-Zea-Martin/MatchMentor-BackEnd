@@ -19,6 +19,11 @@ public class ApiResponse {
     private Boolean success;
 
     /**
+     * Contains the HTTP status code returned from the API.
+     */
+    private int statusCode;
+
+    /**
      * Contains the data returned from the API.
      */
     private Object data;

@@ -7,6 +7,7 @@ import com.scaffold.template.repositories.UserRepository;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,9 @@ public class PasswordResetTokenService {
     @Value("${jwt.secret}")
     private String secretKey;
 
+    // Tiempo de expiración del token en horas
+    int expirationTimeInHours = 1;
+
     /**
      * Constructor del servicio.
      *
@@ -53,15 +57,16 @@ public class PasswordResetTokenService {
      * @param user el usuario para el que se generará el token.
      * @return el token generado.
      */
+    @Transactional
     public String createTokenForUser(UserEntity user) {
 
-        // Eliminar tokens existentes para el usuario
-        passwordResetTokenRepository.deleteByUser(user);
+        // Eliminar tokens existentes para el usuario utilizando consulta nativa
+        passwordResetTokenRepository.deleteByUser(user.getId());
 
         String token = Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
-                .setExpiration(Date.from(LocalDateTime.now().plusHours(1).atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(LocalDateTime.now().plusHours(expirationTimeInHours).atZone(ZoneId.systemDefault()).toInstant()))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
 
@@ -69,7 +74,7 @@ public class PasswordResetTokenService {
         PasswordResetToken passwordResetToken = new PasswordResetToken();
         passwordResetToken.setToken(token);
         passwordResetToken.setUser(user);
-        passwordResetToken.setExpiryDate(LocalDateTime.now().plusHours(1));
+        passwordResetToken.setExpiryDate(LocalDateTime.now().plusHours(expirationTimeInHours));
         passwordResetToken.setUsed(false);
 
         passwordResetTokenRepository.save(passwordResetToken);
@@ -115,6 +120,7 @@ public class PasswordResetTokenService {
      * @param newPassword la nueva contraseña a establecer.
      * @return true si la contraseña fue restablecida correctamente, false en caso contrario.
      */
+    @Transactional
     public boolean resetPassword(String token, String newPassword) {
         Optional<PasswordResetToken> optionalToken = passwordResetTokenRepository.findByToken(token);
         if (optionalToken.isEmpty()) {
