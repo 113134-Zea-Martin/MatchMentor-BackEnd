@@ -47,7 +47,7 @@ jwt.expiration=86400000  # 24 horas en milisegundos
 ### URLs
 ```
 app.url=http://localhost:8080
-frontend.url=http://localhost:3000
+frontend.url=http://localhost:4200
 ```
 
 ## API Endpoints
