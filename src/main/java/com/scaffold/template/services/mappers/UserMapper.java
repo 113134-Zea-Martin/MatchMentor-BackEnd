@@ -3,7 +3,11 @@ package com.scaffold.template.services.mappers;
 import com.scaffold.template.dtos.auth.UserRegisterRequestDTO;
 import com.scaffold.template.dtos.auth.UserRegisterResponseDTO;
 import com.scaffold.template.entities.UserEntity;
+import com.scaffold.template.entities.UserInterestEntity;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Clase de utilidad para mapear entre entidades de usuario y DTOs relacionados.
@@ -24,7 +28,10 @@ public class UserMapper {
         userEntity.setLastName(userRegisterRequestDTO.getLastName());
         userEntity.setEmail(userRegisterRequestDTO.getEmail());
         userEntity.setPassword(userRegisterRequestDTO.getPassword());
-        userEntity.setInterests(userRegisterRequestDTO.getInterests());
+
+        List<UserInterestEntity> userInterestEntityList = new ArrayList<>();
+
+        userEntity.setUserInterests(userInterestEntityList);
         return userEntity;
     }
 
@@ -39,7 +46,7 @@ public class UserMapper {
         responseDTO.setFirstName(userEntity.getFirstName());
         responseDTO.setLastName(userEntity.getLastName());
         responseDTO.setEmail(userEntity.getEmail());
-        responseDTO.setInterests(userEntity.getInterests());
+        responseDTO.setInterests("");
         return responseDTO;
     }
 }

@@ -3,8 +3,10 @@ package com.scaffold.template.services.impl;
 import com.scaffold.template.dtos.auth.UserRegisterRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginResponseDTO;
+import com.scaffold.template.entities.InterestEntity;
 import com.scaffold.template.entities.Role;
 import com.scaffold.template.entities.UserEntity;
+import com.scaffold.template.entities.UserInterestEntity;
 import com.scaffold.template.repositories.UserRepository;
 import com.scaffold.template.security.JwtConfig;
 import com.scaffold.template.services.AuthService;
@@ -17,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -89,7 +92,11 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setLastName(userRegisterRequestDTO.getLastName());
         userEntity.setEmail(userRegisterRequestDTO.getEmail());
         userEntity.setPassword(encodedPassword);
-        userEntity.setInterests(userRegisterRequestDTO.getInterests());
+
+        // Asignar los intereses del usuario
+        List<UserInterestEntity> userInterestEntityList = new ArrayList<>();
+
+        userEntity.setUserInterests(userInterestEntityList);
         userEntity.setRole(Role.STUDENT); // Asignar el rol de estudiante por defecto
         userEntity.setCreatedAt(LocalDateTime.now()); // Establecer la fecha de creación
         userEntity.setIsActive(true); // Establecer el estado activo del usuario

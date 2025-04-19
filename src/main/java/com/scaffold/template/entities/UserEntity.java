@@ -1,6 +1,7 @@
 package com.scaffold.template.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,12 +9,14 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Entidad que representa a un usuario en el sistema.
@@ -57,10 +60,89 @@ public class UserEntity {
     private String password;
 
     /**
-     * Intereses del usuario.
+     * Fecha de nacimiento del usuario.
      * Campo opcional.
      */
-    private String interests;
+    private LocalDate birthDate;
+
+    /**
+     * Ubicación del usuario.
+     * Campo opcional.
+     */
+    private String location;
+
+    // Campos específicos para estudiantes
+
+    /**
+     * Nivel educativo del estudiante.
+     * Campo opcional.
+     */
+    private String educationLevel;
+
+    /**
+     * Área de estudio del estudiante.
+     * Campo opcional.
+     */
+    private String studyArea;
+
+    /**
+     * Institución educativa del estudiante.
+     * Campo opcional.
+     */
+    private String institution;
+
+    /**
+     * Año de graduación del estudiante.
+     * Campo opcional.
+     */
+    private String graduationYear;
+
+    /**
+     * Objetivos de mentoría del estudiante.
+     * Campo opcional.
+     */
+    private String mentoringGoals;
+
+    // Campos específicos para tutores
+
+    /**
+     * Profesión actual del tutor.
+     * Campo opcional.
+     */
+    private String currentProfession;
+
+    /**
+     * Empresa u organización del tutor.
+     * Campo opcional.
+     */
+    private String company;
+
+    /**
+     * Años de experiencia del tutor en su campo.
+     * Campo opcional.
+     */
+    private int yearsOfExperience;
+
+    /**
+     * Biografía profesional del tutor.
+     * Campo opcional.
+     */
+    private String professionalBio;
+
+    /**
+     * Tarifa por hora del tutor.
+     * Campo opcional.
+     */
+    private double hourlyRate;
+
+    // Campos comunes para estudiantes y tutores
+
+    /**
+     * Lista de intereses asociados al usuario.
+     * Relación uno a muchos con la entidad UserInterestEntity.
+     */
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserInterestEntity> userInterests = new ArrayList<>();
 
     /**
      * Rol del usuario en el sistema.
@@ -68,6 +150,18 @@ public class UserEntity {
      */
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    /**
+     * URL del perfil de LinkedIn del usuario.
+     * Campo opcional.
+     */
+    private String linkedinUrl;
+
+    /**
+     * Biografía del usuario.
+     * Campo opcional.
+     */
+    private String bio;
 
     /**
      * Fecha y hora de creación del usuario.
@@ -81,4 +175,5 @@ public class UserEntity {
      * Puede ser utilizado para deshabilitar cuentas sin eliminarlas.
      */
     private Boolean isActive;
+
 }
