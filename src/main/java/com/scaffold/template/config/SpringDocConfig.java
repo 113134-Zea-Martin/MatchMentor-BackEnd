@@ -6,6 +6,8 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,10 +36,23 @@ public class SpringDocConfig {
         Server server = new Server()
                 .url(url)
                 .description(appDescription);
+        // Definición del esquema de seguridad
+        SecurityScheme securityScheme = new SecurityScheme()
+                .name("Authorization")
+                .type(SecurityScheme.Type.HTTP)
+                .scheme("bearer")
+                .bearerFormat("JWT");
+
+        // Requisito de seguridad para aplicarlo a todos los endpoints
+        SecurityRequirement securityRequirement = new SecurityRequirement()
+                .addList("Authorization");
+
+        // Construcción final del OpenAPI con todo
         return new OpenAPI()
-                .components(new Components())
                 .info(info)
-                .addServersItem(server);
+                .addServersItem(server)
+                .components(new Components().addSecuritySchemes("Authorization", securityScheme))
+                .addSecurityItem(securityRequirement);
     }
 
     @Bean

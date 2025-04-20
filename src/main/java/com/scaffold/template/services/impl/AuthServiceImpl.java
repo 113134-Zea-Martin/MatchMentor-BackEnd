@@ -3,7 +3,7 @@ package com.scaffold.template.services.impl;
 import com.scaffold.template.dtos.auth.UserRegisterRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginResponseDTO;
-import com.scaffold.template.entities.InterestEntity;
+import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.Role;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.entities.UserInterestEntity;
@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Implementación del servicio de autenticación.
@@ -63,8 +65,22 @@ public class AuthServiceImpl implements AuthService {
      * @return una lista de entidades de usuario
      */
     @Override
-    public List<UserEntity> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserResponseDTO> getAllUsers() {
+        List<UserEntity> users = userRepository.findAll();
+        List<UserResponseDTO> userResponseDTOList = new ArrayList<>();
+
+        for (UserEntity user : users) {
+            UserResponseDTO userResponseDTO = new UserResponseDTO();
+            userResponseDTO.setId(user.getId());
+            userResponseDTO.setFirstName(user.getFirstName());
+            userResponseDTO.setLastName(user.getLastName());
+            userResponseDTO.setEmail(user.getEmail());
+            userResponseDTO.setRole(user.getRole());
+            userResponseDTO.setIsActive(user.getIsActive());
+            userResponseDTOList.add(userResponseDTO);
+        }
+
+        return userResponseDTOList;
     }
 
     /**
@@ -137,7 +153,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         User userDetails = (User) authentication.getPrincipal();
-        String token = jwtConfig.generateToken(userDetails);
+
 
         UserEntity user = userRepository.findByEmail(loginRequestDTO.getEmail());
 
@@ -148,6 +164,17 @@ public class AuthServiceImpl implements AuthService {
         loginResponseDTO.setEmail(user.getEmail());
         loginResponseDTO.setRole(user.getRole());
         loginResponseDTO.setActive(user.getIsActive());
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("firstName", user.getFirstName());
+        claims.put("lastName", user.getLastName());
+        claims.put("email", user.getEmail());
+        claims.put("role", user.getRole());
+        claims.put("isActive", user.getIsActive());
+
+        String token = jwtConfig.generateToken(claims, userDetails);
+
         loginResponseDTO.setToken(token);
 
         return loginResponseDTO;
@@ -164,4 +191,5 @@ public class AuthServiceImpl implements AuthService {
 
         return userEntity;
     }
+
 }

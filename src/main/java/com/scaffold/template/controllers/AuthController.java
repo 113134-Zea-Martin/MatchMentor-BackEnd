@@ -6,6 +6,7 @@ import com.scaffold.template.dtos.auth.UserRegisterRequestDTO;
 import com.scaffold.template.dtos.auth.UserRegisterResponseDTO;
 import com.scaffold.template.dtos.auth.login.LoginRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginResponseDTO;
+import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.services.AuthService;
 import com.scaffold.template.services.PasswordResetTokenService;
@@ -63,7 +64,7 @@ public class AuthController {
         response.setTimestamp(LocalDateTime.now());
 
         try {
-            List<UserEntity> users = authService.getAllUsers();
+            List<UserResponseDTO> users = authService.getAllUsers();
             response.setSuccess(true);
             response.setStatusCode(200);
             response.setData(users);

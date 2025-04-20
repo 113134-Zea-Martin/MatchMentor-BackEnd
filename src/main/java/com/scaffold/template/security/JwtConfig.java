@@ -61,8 +61,12 @@ public class JwtConfig {
     }
 
     // Generar token para un usuario
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
+    public String generateToken(Map<String, Object> claims,UserDetails userDetails) {
+        // Aquí puedes agregar cualquier claim adicional que desees incluir en el token
+        // Por ejemplo:
+        // claims.put("role", userDetails.getAuthorities());
+//        Map<String, Object> claims = new HashMap<>();
+
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -82,4 +86,11 @@ public class JwtConfig {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    // Extraer ID de usuario del token
+    public Long extractUserIdFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("id", Long.class);
+    }
+
 }
