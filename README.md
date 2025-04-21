@@ -11,6 +11,7 @@ Este proyecto proporciona un scaffolding inicial para aplicaciones Java Spring B
 - Envío de correos electrónicos
 - Estructura MVC (Model-View-Controller)
 - Respuestas API estandarizadas
+- Perfiles de usuario (Estudiante/Tutor)
 
 ## Estructura del proyecto
 
@@ -22,12 +23,18 @@ src/
 │   │       └── scaffold/
 │   │           └── template/
 │   │               ├── controllers/
-│   │               │   └── AuthController.java
+│   │               │   ├── AuthController.java
+│   │               │   └── UserController.java
 │   │               ├── dtos/
+│   │               │   └── profile/
+│   │               │       ├── UserResponseDTO.java
+│   │               │       ├── StudentResponseDTO.java
+│   │               │       └── TutorResponseDTO.java
 │   │               ├── entities/
 │   │               │   └── UserEntity.java
 │   │               ├── services/
 │   │               │   ├── AuthService.java
+│   │               │   ├── UserService.java
 │   │               │   ├── PasswordResetTokenService.java
 │   │               │   └── email/
 │   │               │       └── EmailService.java
@@ -58,6 +65,12 @@ frontend.url=http://localhost:4200
 - `POST /api/auth/login` - Inicio de sesión
 - `POST /api/auth/request-reset?email=user@example.com` - Solicitar restablecimiento de contraseña
 - `POST /api/auth/reset-password` - Restablecer contraseña
+
+### Usuarios
+
+- `GET /api/users/{profileId}` - Obtener perfil de usuario por ID
+- `GET /api/users/me` - Obtener información del usuario autenticado
+- `GET /api/users/me/roles` - Obtener información específica según el rol del usuario (Estudiante/Tutor)
 
 ### Administración
 - `GET /api/auth/users` - Obtener todos los usuarios (requiere autenticación)
