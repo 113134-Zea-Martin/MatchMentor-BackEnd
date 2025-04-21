@@ -1,5 +1,7 @@
 package com.scaffold.template.services.impl;
 
+import com.scaffold.template.dtos.profile.StudentResponseDTO;
+import com.scaffold.template.dtos.profile.TutorResponseDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.entities.UserInterestEntity;
@@ -81,5 +83,52 @@ public class UserServiceImpl implements UserService {
         userResponseDTO.setIsActive(userEntity.getIsActive());
 
         return userResponseDTO;
+    }
+
+    @Override
+    public StudentResponseDTO getStudentById(Long id) {
+        UserResponseDTO userResponseDTO = getUserById(id);
+        StudentResponseDTO studentResponseDTO = new StudentResponseDTO();
+        studentResponseDTO.setId(userResponseDTO.getId());
+        studentResponseDTO.setFirstName(userResponseDTO.getFirstName());
+        studentResponseDTO.setLastName(userResponseDTO.getLastName());
+        studentResponseDTO.setEmail(userResponseDTO.getEmail());
+        studentResponseDTO.setBirthDate(userResponseDTO.getBirthDate());
+        studentResponseDTO.setLocation(userResponseDTO.getLocation());
+        studentResponseDTO.setEducationLevel(userResponseDTO.getEducationLevel());
+        studentResponseDTO.setStudyArea(userResponseDTO.getStudyArea());
+        studentResponseDTO.setInstitution(userResponseDTO.getInstitution());
+        studentResponseDTO.setGraduationYear(userResponseDTO.getGraduationYear());
+        studentResponseDTO.setMentoringGoals(userResponseDTO.getMentoringGoals());
+        studentResponseDTO.setInterests(userResponseDTO.getInterests());
+        studentResponseDTO.setLinkedinUrl(userResponseDTO.getLinkedinUrl());
+        studentResponseDTO.setBio(userResponseDTO.getBio());
+        studentResponseDTO.setCreatedAt(userResponseDTO.getCreatedAt());
+        studentResponseDTO.setIsActive(userResponseDTO.getIsActive());
+
+        return studentResponseDTO;
+    }
+
+    @Override
+    public TutorResponseDTO getTutorById(Long id) {
+        UserResponseDTO userResponseDTO = getUserById(id);
+        TutorResponseDTO tutorResponseDTO = new TutorResponseDTO();
+        tutorResponseDTO.setId(userResponseDTO.getId());
+        tutorResponseDTO.setFirstName(userResponseDTO.getFirstName());
+        tutorResponseDTO.setLastName(userResponseDTO.getLastName());
+        tutorResponseDTO.setEmail(userResponseDTO.getEmail());
+        tutorResponseDTO.setBirthDate(userResponseDTO.getBirthDate());
+        tutorResponseDTO.setLocation(userResponseDTO.getLocation());
+        tutorResponseDTO.setCurrentProfession(userResponseDTO.getCurrentProfession());
+        tutorResponseDTO.setCompany(userResponseDTO.getCompany());
+        tutorResponseDTO.setYearsOfExperience(userResponseDTO.getYearsOfExperience());
+        tutorResponseDTO.setProfessionalBio(userResponseDTO.getProfessionalBio());
+        tutorResponseDTO.setHourlyRate(userResponseDTO.getHourlyRate());
+        tutorResponseDTO.setInterests(userResponseDTO.getInterests());
+        tutorResponseDTO.setLinkedinUrl(userResponseDTO.getLinkedinUrl());
+        tutorResponseDTO.setBio(userResponseDTO.getBio());
+        tutorResponseDTO.setCreatedAt(userResponseDTO.getCreatedAt());
+        tutorResponseDTO.setIsActive(userResponseDTO.getIsActive());
+        return tutorResponseDTO;
     }
 }

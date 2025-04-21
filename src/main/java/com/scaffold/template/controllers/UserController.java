@@ -1,8 +1,11 @@
 package com.scaffold.template.controllers;
 
 import com.scaffold.template.dtos.ApiResponse;
+import com.scaffold.template.dtos.profile.StudentResponseDTO;
+import com.scaffold.template.dtos.profile.TutorResponseDTO;
 import com.scaffold.template.dtos.profile.UserInfoDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
+import com.scaffold.template.entities.Role;
 import com.scaffold.template.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -55,13 +58,38 @@ public class UserController {
 
     }
 
+//    @GetMapping("/me")
+//    public ResponseEntity<UserInfoDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+//        if (userDetails == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        String email = userDetails.getUsername();
+//        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(email);
+//        UserInfoDTO userInfoDTO = new UserInfoDTO();
+//        userInfoDTO.setFirstName(userResponseDTO.getFirstName());
+//        userInfoDTO.setLastName(userResponseDTO.getLastName());
+//        userInfoDTO.setRole(userResponseDTO.getRole().toString());
+//        userInfoDTO.setId(userResponseDTO.getId());
+//        userInfoDTO.setActive(userResponseDTO.getIsActive());
+//        userInfoDTO.setEmail(userResponseDTO.getEmail());
+//        userInfoDTO.setSub(userDetails.getUsername());
+//        userInfoDTO.setIat(System.currentTimeMillis() / 1000L);
+//        return ResponseEntity.ok(userInfoDTO);
+//    }
+
     @GetMapping("/me")
-    public ResponseEntity<UserInfoDTO> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<ApiResponse> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            ApiResponse response = ApiResponse.builder()
+                    .success(false)
+                    .statusCode(401)
+                    .message("Unauthorized")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
-        String username = userDetails.getUsername();
-        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(username);
+        String email = userDetails.getUsername();
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(email);
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setFirstName(userResponseDTO.getFirstName());
         userInfoDTO.setLastName(userResponseDTO.getLastName());
@@ -70,13 +98,56 @@ public class UserController {
         userInfoDTO.setActive(userResponseDTO.getIsActive());
         userInfoDTO.setEmail(userResponseDTO.getEmail());
         userInfoDTO.setSub(userDetails.getUsername());
-        userInfoDTO.setIat(System.currentTimeMillis() / 1000L);
-//        userInfoDTO.setExp(userResponseDTO.getCreatedAt().getTime() / 1000L);
-//        userInfoDTO.setExp(userResponseDTO.getCreatedAt().toInstant(ZoneOffset.UTC).getEpochSecond());
-//        userInfoDTO.setAuthorities(userDetails.getAuthorities().stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList()));
-        return ResponseEntity.ok(userInfoDTO);
+        userInfoDTO.setIat(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+
+        ApiResponse response = ApiResponse.builder()
+                .success(true)
+                .statusCode(200)
+                .data(userInfoDTO)
+                .message("User profile retrieved successfully")
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("me/roles")
+    public ResponseEntity<ApiResponse> getCurrentUserRoles(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            ApiResponse response = ApiResponse.builder()
+                    .success(false)
+                    .statusCode(401)
+                    .message("Unauthorized")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        ApiResponse response = new ApiResponse();
+        response.setSuccess(true);
+        response.setStatusCode(200);
+        response.setTimestamp(LocalDateTime.now());
+
+        String email = userDetails.getUsername();
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(email);
+
+        Role role = userResponseDTO.getRole();
+        if (role == Role.STUDENT) {
+            StudentResponseDTO studentResponseDTO = userService.getStudentById(userResponseDTO.getId());
+            response.setData(studentResponseDTO);
+            response.setMessage("Student profile retrieved successfully");
+        } else if (role == Role.TUTOR) {
+            TutorResponseDTO tutorResponseDTO = userService.getTutorById(userResponseDTO.getId());
+            response.setData(tutorResponseDTO);
+            response.setMessage("Tutor profile retrieved successfully");
+        } else {
+            response.setSuccess(false);
+            response.setMessage("User role not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+
+        return ResponseEntity.ok(response);
     }
 
 }

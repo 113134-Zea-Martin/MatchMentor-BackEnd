@@ -3,7 +3,7 @@ package com.scaffold.template.dtos.profile;
 import lombok.Data;
 
 import java.util.List;
-
+// DTO para obtener información del usuario desde el token JWT
 @Data
 public class UserInfoDTO {
     private String firstName;
