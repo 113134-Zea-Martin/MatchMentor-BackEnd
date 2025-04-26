@@ -4,23 +4,56 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.scaffold.template.entities.Role;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO para actualizar la información de un usuario.
+ * Contiene campos comunes y específicos para estudiantes y tutores.
+ */
 @Data
-public class UserResponseDTO {
-    private Long id;
+public class UpdateUserRequestDTO {
+
+    /**
+     * Nombre del usuario.
+     * No puede estar vacío.
+     */
+    @NotEmpty(message = "El nombre no puede estar vacío")
     private String firstName;
+
+    /**
+     * Apellido del usuario.
+     * No puede estar vacío.
+     */
+    @NotEmpty(message = "El apellido no puede estar vacío")
     private String lastName;
+
+    /**
+     * Correo electrónico del usuario.
+     * No puede estar vacío y debe ser válido.
+     */
+    @NotEmpty(message = "El correo electrónico no puede estar vacío")
+    @Email(message = "El correo electrónico no es válido")
     private String email;
 
-
+    /**
+     * Fecha de nacimiento del usuario.
+     * Formato: yyyy-MM-dd.
+     */
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
+
+    /**
+     * Ubicación del usuario.
+     * Campo opcional.
+     */
     private String location;
+
     // Campos específicos para estudiantes
 
     /**
@@ -69,8 +102,10 @@ public class UserResponseDTO {
 
     /**
      * Años de experiencia del tutor en su campo.
+     * No puede ser un valor negativo.
      * Campo opcional.
      */
+    @Min(value = 0, message = "Los años de experiencia no pueden ser negativos")
     private int yearsOfExperience;
 
     /**
@@ -85,10 +120,18 @@ public class UserResponseDTO {
      */
     private double hourlyRate;
 
+    /**
+     * Indica si el perfil del usuario es visible.
+     * Campo opcional.
+     */
     private Boolean isVisible;
 
     // Campos comunes para estudiantes y tutores
 
+    /**
+     * Lista de intereses del usuario.
+     * Campo opcional.
+     */
     private List<String> interests;
 
     /**
@@ -109,13 +152,6 @@ public class UserResponseDTO {
      * Campo opcional.
      */
     private String bio;
-
-    /**
-     * Fecha y hora de creación del usuario.
-     * Representa el momento en que se creó el registro.
-     */
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime createdAt;
 
     /**
      * Indica si el usuario está activo.

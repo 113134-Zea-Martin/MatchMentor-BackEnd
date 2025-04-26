@@ -3,6 +3,7 @@ package com.scaffold.template.controllers;
 import com.scaffold.template.dtos.ApiResponse;
 import com.scaffold.template.dtos.profile.StudentResponseDTO;
 import com.scaffold.template.dtos.profile.TutorResponseDTO;
+import com.scaffold.template.dtos.profile.UpdateUserRequestDTO;
 import com.scaffold.template.dtos.profile.UserInfoDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.Role;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -54,6 +57,35 @@ public class UserController {
                     .timestamp(LocalDateTime.now())
                     .build();
             return ResponseEntity.status(200).body(response);
+        }
+
+    }
+
+    @PutMapping("/{profileId}")
+    public ResponseEntity<ApiResponse> updateUserProfile(@PathVariable Long profileId,
+                                                         @RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
+
+        // Logic to update the user profile goes here
+        UserResponseDTO updatedUser = userService.updateUser(profileId, updateUserRequestDTO);
+        try {
+            ApiResponse response = ApiResponse.builder()
+                    .success(true)
+                    .statusCode(200)
+                    .data(updatedUser)
+                    .message("Se actualizó tu perfil correctamente")
+                    .timestamp(LocalDateTime.now())
+                    .build();
+
+            return ResponseEntity.ok(response);
+            // Assuming userService.updateUser returns the updated user
+        } catch (Exception e) {
+            ApiResponse response = ApiResponse.builder()
+                    .success(false)
+                    .statusCode(400)
+                    .message("Error: " + e.getMessage())
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
 
     }

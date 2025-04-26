@@ -136,6 +136,12 @@ public class UserEntity {
      */
     private double hourlyRate;
 
+    /**
+     * Indica si el perfil del usuario es visible para otros usuarios.
+     * Campo opcional.
+     */
+    private Boolean isVisible;
+
     // Campos comunes para estudiantes y tutores
 
     /**

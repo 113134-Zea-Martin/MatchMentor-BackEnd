@@ -116,6 +116,7 @@ public class AuthServiceImpl implements AuthService {
         userEntity.setRole(Role.STUDENT); // Asignar el rol de estudiante por defecto
         userEntity.setCreatedAt(LocalDateTime.now()); // Establecer la fecha de creación
         userEntity.setIsActive(true); // Establecer el estado activo del usuario
+        userEntity.setIsVisible(false); // Establecer el estado visible del usuario
 
         // Guardar la entidad de usuario en la base de datos
         return userRepository.save(userEntity);
