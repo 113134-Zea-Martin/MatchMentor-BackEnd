@@ -1,15 +1,20 @@
 package com.scaffold.template.controllers;
 
 import com.scaffold.template.dtos.ApiResponse;
+import com.scaffold.template.dtos.match.CreateMatchRequestDTO;
+import com.scaffold.template.dtos.match.MatchResponseDTO;
+import com.scaffold.template.dtos.match.StudentPendingRequestMatchDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
-import com.scaffold.template.entities.UserEntity;
+import com.scaffold.template.entities.MatchEntity;
+import com.scaffold.template.entities.Status;
 import com.scaffold.template.services.match.MatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -55,6 +60,33 @@ public class MatchController {
         response.setData(tutor);
         response.setMessage("Tutor compatible con el estudiante encontrado");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping()
+    public ResponseEntity<ApiResponse> createMatch(@RequestBody CreateMatchRequestDTO request) {
+        ApiResponse response = new ApiResponse();
+        response.setTimestamp(LocalDateTime.now());
+        try {
+            MatchEntity match = matchService.createMatch(request.getStudentId(), request.getTutorId(), request.isLiked());
+            MatchResponseDTO matchResponseDTO = matchService.mapToMatchResponseDTO(match);
+            response.setSuccess(true);
+            response.setStatusCode(200);
+            response.setData(matchResponseDTO);
+            response.setMessage("Match creado con éxito");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al crear el match: " + e.getMessage());
+            return ResponseEntity.status(200).body(response);
+        }
+    }
+
+    @GetMapping("/pending-request/{tutorId}")
+    public ResponseEntity<List<StudentPendingRequestMatchDTO>> getPendingRequestMatches(@PathVariable Long tutorId) {
+        List<MatchEntity> matches = matchService.getMatchesByStatusAndTutorId(Status.PENDING, tutorId);
+        List<StudentPendingRequestMatchDTO> studentPendingRequestMatchDTOS = matchService.mapToStudentPendingRequestMatchDTOs(matches);
+        return ResponseEntity.ok(studentPendingRequestMatchDTOS);
     }
 
 }

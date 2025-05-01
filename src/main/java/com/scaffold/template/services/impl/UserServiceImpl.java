@@ -8,48 +8,42 @@ import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.InterestEntity;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.entities.UserInterestEntity;
-import com.scaffold.template.repositories.InterestRepository;
-import com.scaffold.template.repositories.UserInterestRepository;
 import com.scaffold.template.repositories.UserRepository;
-import com.scaffold.template.repositories.UserViewedProfileRepository;
 import com.scaffold.template.security.JwtConfig;
 import com.scaffold.template.services.InterestService;
 import com.scaffold.template.services.UserService;
+import com.scaffold.template.services.userViewedProfileService.UserViewedProfileService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     public final JwtConfig jwtConfig;
-    public final UserInterestRepository userInterestRepository;
     public final InterestService interestService;
-    private final UserViewedProfileRepository userViewedProfileRepository;
+    private final UserViewedProfileService userViewedProfileService;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository
             , JwtConfig jwtConfig
-            , UserInterestRepository userInterestRepository
             , InterestService interestService
-            , UserViewedProfileRepository userViewedProfileRepository) {
+            , UserViewedProfileService userViewedProfileService) {
         this.userRepository = userRepository;
         this.jwtConfig = jwtConfig;
-        this.userInterestRepository = userInterestRepository;
         this.interestService = interestService;
-        this.userViewedProfileRepository = userViewedProfileRepository;
+        this.userViewedProfileService = userViewedProfileService;
     }
 
     @Override
     public UserResponseDTO getUserById(Long id) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+//        UserEntity userEntity = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity userEntity = getUserEntityById(id);
 
         UserResponseDTO userResponseDTO = new UserResponseDTO();
         userResponseDTO.setId(userEntity.getId());
@@ -157,12 +151,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO updateUser(Long id, UpdateUserRequestDTO updateUserRequestDTO) {
-        UserEntity userEntity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+//        UserEntity userEntity = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+        UserEntity userEntity = getUserEntityById(id);
 
-//        for (UserInterestEntity userInterest : userEntity.getUserInterests()) {
-//            userInterestRepository.deleteByUserIdAndInterestId(userEntity.getId(), userInterest.getInterest().getId());
-//        }
         userEntity.getUserInterests().clear();
 
         userEntity.setFirstName(updateUserRequestDTO.getFirstName());
@@ -207,9 +199,19 @@ public class UserServiceImpl implements UserService {
         UserEntity updatedUser = userRepository.save(userEntity);
 
         // Limpiamos los perfiles visualizados
-        userViewedProfileRepository.deleteByViewerId(userEntity.getId());
-
+        userViewedProfileService.deleteUserViewedProfileByViewerId(userEntity.getId());
 
         return getUserById(updatedUser.getId());
+    }
+
+    @Override
+    public UserEntity getUserEntityById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    @Override
+    public List<UserEntity> findTutorsWithCommonInterests(Long userId) {
+        return userRepository.findTutorsWithCommonInterests(userId);
     }
 }

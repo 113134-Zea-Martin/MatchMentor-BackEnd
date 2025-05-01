@@ -182,4 +182,26 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+//    @GetMapping("{idStudent}")
+//    public ResponseEntity<ApiResponse> getStudentById(@PathVariable Long idStudent) {
+//        try {
+//            StudentResponseDTO studentResponseDTO = userService.getStudentById(idStudent);
+//            ApiResponse response = ApiResponse.builder()
+//                    .success(true)
+//                    .statusCode(200)
+//                    .data(studentResponseDTO)
+//                    .message("Student profile retrieved successfully")
+//                    .timestamp(LocalDateTime.now())
+//                    .build();
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            ApiResponse response = ApiResponse.builder()
+//                    .success(false)
+//                    .statusCode(401)
+//                    .message("Error: " + e.getMessage())
+//                    .timestamp(LocalDateTime.now())
+//                    .build();
+//            return ResponseEntity.status(200).body(response);
+//        }
+//    }
 }

@@ -2,7 +2,6 @@ package com.scaffold.template.controllers;
 
 import com.scaffold.template.dtos.ApiResponse;
 import com.scaffold.template.dtos.interest.InterestRequestDTO;
-import com.scaffold.template.entities.InterestEntity;
 import com.scaffold.template.services.InterestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

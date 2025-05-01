@@ -33,7 +33,7 @@ public class UserViewedProfileEntity {
     private LocalDateTime viewedAt;
 
     @Enumerated(EnumType.STRING)
-    private ViewStatus status; // PENDING, ACCEPTED, REJECTED
+    private Status status; // PENDING, ACCEPTED, REJECTED
 
     private Boolean isMatch; // Si terminó en un match real
 }

@@ -1,11 +1,7 @@
 package com.scaffold.template.config;
 
-import com.scaffold.template.entities.InterestEntity;
-import com.scaffold.template.entities.Role;
-import com.scaffold.template.entities.UserEntity;
-import com.scaffold.template.entities.UserInterestEntity;
-import com.scaffold.template.repositories.InterestRepository;
-import com.scaffold.template.repositories.UserRepository;
+import com.scaffold.template.entities.*;
+import com.scaffold.template.repositories.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +17,13 @@ import java.util.ArrayList;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, PasswordEncoder passwordEncoder, InterestRepository interestRepository) {
+    public CommandLineRunner initData(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            InterestRepository interestRepository,
+            MatchRepository matchRepository,
+            NotificationRepository notificationRepository,
+            UserViewedProfileRepository userViewedProfileRepository) {
         return args -> {
             // Verificar si ya existen usuarios para evitar duplicados
             if (userRepository.count() == 0) {
@@ -183,7 +185,7 @@ public class DataInitializer {
                 tutor1.setBio("Apasionado por compartir conocimientos y ayudar a nuevos desarrolladores");
                 tutor1.setRole(Role.TUTOR);
                 tutor1.setIsActive(true);
-                tutor1.setIsVisible(false);
+                tutor1.setIsVisible(true);
                 tutor1.setCreatedAt(LocalDateTime.now());
 
                 // Intereses para el tutor 1
@@ -345,7 +347,118 @@ public class DataInitializer {
                 userInactivo.setCreatedAt(LocalDateTime.now());
                 userRepository.save(userInactivo);
 
-                System.out.println("Datos iniciales cargados correctamente");
+                // ------------------ AGREGAR DATOS PARA PERFILES VISTOS ------------------
+                // Estudiante 1 ve perfil de tutor 1 (le interesa)
+                UserViewedProfileEntity view1 = new UserViewedProfileEntity();
+                view1.setViewer(student1);
+                view1.setViewedUser(tutor1);
+                view1.setStatus(Status.REJECTED);
+                view1.setViewedAt(LocalDateTime.now().minusDays(5));
+                userViewedProfileRepository.save(view1);
+
+                // Estudiante 1 ve perfil de tutor 2 (no le interesa)
+                UserViewedProfileEntity view2 = new UserViewedProfileEntity();
+                view2.setViewer(student1);
+                view2.setViewedUser(tutor2);
+                view2.setStatus(Status.REJECTED);
+                view2.setViewedAt(LocalDateTime.now().minusDays(4));
+                userViewedProfileRepository.save(view2);
+
+                // Estudiante 2 ve perfil de tutor 2 (le interesa)
+                UserViewedProfileEntity view3 = new UserViewedProfileEntity();
+                view3.setViewer(student2);
+                view3.setViewedUser(tutor2);
+                view3.setStatus(Status.ACCEPTED);
+                view3.setViewedAt(LocalDateTime.now().minusDays(3));
+                userViewedProfileRepository.save(view3);
+
+                // Estudiante 3 ve perfil de tutor 3 (le interesa)
+                UserViewedProfileEntity view4 = new UserViewedProfileEntity();
+                view4.setViewer(student3);
+                view4.setViewedUser(tutor3);
+                view4.setStatus(Status.ACCEPTED);
+                view4.setViewedAt(LocalDateTime.now().minusDays(2));
+                userViewedProfileRepository.save(view4);
+
+                // ------------------ AGREGAR DATOS PARA MATCHES ------------------
+                // Match entre estudiante 1 y tutor 1 (pendiente)
+                MatchEntity match1 = new MatchEntity();
+                match1.setStudent(student1);
+                match1.setTutor(tutor1);
+                match1.setStatus(Status.PENDING);
+                match1.setCreatedAt(LocalDateTime.now().minusDays(5));
+                matchRepository.save(match1);
+
+                // Match entre estudiante 2 y tutor 2 (aceptado)
+                MatchEntity match2 = new MatchEntity();
+                match2.setStudent(student2);
+                match2.setTutor(tutor2);
+                match2.setStatus(Status.ACCEPTED);
+                match2.setCreatedAt(LocalDateTime.now().minusDays(3));
+                match2.setUpdatedAt(LocalDateTime.now().minusDays(2));
+                matchRepository.save(match2);
+
+                // Match entre estudiante 3 y tutor 3 (pendiente)
+                MatchEntity match3 = new MatchEntity();
+                match3.setStudent(student3);
+                match3.setTutor(tutor3);
+                match3.setStatus(Status.PENDING);
+                match3.setCreatedAt(LocalDateTime.now().minusDays(1));
+                matchRepository.save(match3);
+
+                // Match entre estudiante 1 y tutor 3 (rechazado)
+                MatchEntity match4 = new MatchEntity();
+                match4.setStudent(student1);
+                match4.setTutor(tutor3);
+                match4.setStatus(Status.REJECTED);
+                match4.setCreatedAt(LocalDateTime.now().minusDays(7));
+                match4.setUpdatedAt(LocalDateTime.now().minusDays(6));
+                matchRepository.save(match4);
+
+                // ------------------ AGREGAR DATOS PARA NOTIFICACIONES ------------------
+                // Notificación para tutor 1 (solicitud de conexión)
+                NotificationEntity notification1 = new NotificationEntity();
+                notification1.setUserId(tutor1.getId());
+                notification1.setMessage("Martín González te ha enviado una solicitud de conexión");
+                notification1.setNotificationType(NotificationType.NEW_CONNECTION_REQUEST);
+                notification1.setRelatedEntityId(match1.getId());
+                notification1.setIsRead(false);
+                notification1.setCreatedAt(LocalDateTime.now().minusDays(5));
+                notificationRepository.save(notification1);
+
+                // Notificación para tutor 3 (solicitud de conexión)
+                NotificationEntity notification2 = new NotificationEntity();
+                notification2.setUserId(tutor3.getId());
+                notification2.setMessage("Pedro López te ha enviado una solicitud de conexión");
+                notification2.setNotificationType(NotificationType.NEW_CONNECTION_REQUEST);
+                notification2.setRelatedEntityId(match3.getId());
+                notification2.setIsRead(false);
+                notification2.setCreatedAt(LocalDateTime.now().minusDays(1));
+                notificationRepository.save(notification2);
+
+                // Notificación para estudiante 2 (conexión aceptada)
+                NotificationEntity notification3 = new NotificationEntity();
+                notification3.setUserId(student2.getId());
+                notification3.setMessage("Laura Gómez ha aceptado tu solicitud de conexión");
+                notification3.setNotificationType(NotificationType.CONNECTION_ACCEPTED);
+                notification3.setRelatedEntityId(match2.getId());
+                notification3.setIsRead(true);
+                notification3.setCreatedAt(LocalDateTime.now().minusDays(2));
+//                notification3.setReadAt(LocalDateTime.now().minusDays(2).plusHours(2));
+                notificationRepository.save(notification3);
+
+                // Notificación para estudiante 1 (conexión rechazada)
+                NotificationEntity notification4 = new NotificationEntity();
+                notification4.setUserId(student1.getId());
+                notification4.setMessage("Javier Mendoza ha rechazado tu solicitud de conexión");
+                notification4.setNotificationType((NotificationType.CONNECTION_REJECTED));
+                notification4.setRelatedEntityId(match4.getId());
+                notification4.setIsRead(true);
+                notification4.setCreatedAt(LocalDateTime.now().minusDays(6));
+//                notification4.setReadAt(LocalDateTime.now().minusDays(6).plusHours(1));
+                notificationRepository.save(notification4);
+
+                System.out.println("Datos iniciales cargados correctamente en todas las tablas");
             }
         };
     }

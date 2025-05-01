@@ -7,6 +7,8 @@ import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public interface UserService {
     UserResponseDTO getUserById(Long id);
@@ -14,4 +16,6 @@ public interface UserService {
     StudentResponseDTO getStudentById(Long id);
     TutorResponseDTO getTutorById(Long id);
     UserResponseDTO updateUser(Long id, UpdateUserRequestDTO updateUserRequestDTO);
+    UserEntity getUserEntityById(Long id);
+    List<UserEntity> findTutorsWithCommonInterests(Long userId);
 }
