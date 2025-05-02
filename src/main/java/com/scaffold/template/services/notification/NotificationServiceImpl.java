@@ -29,4 +29,16 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setRelatedEntityId(matchId);
         notificationRepository.save(notification);
     }
+
+    @Override
+    public void createNotificationConnectionAnswered(Long studentId, String tutorName, Long matchId, boolean isAccepted) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setUserId(studentId);
+        notification.setNotificationType(isAccepted ? NotificationType.CONNECTION_ACCEPTED : NotificationType.CONNECTION_REJECTED);
+        notification.setMessage("Tu solicitud de match con " + tutorName + (isAccepted ? " ha sido aceptada!" : " ha sido rechazada!"));
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setIsRead(false);
+        notification.setRelatedEntityId(matchId);
+        notificationRepository.save(notification);
+    }
 }

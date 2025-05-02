@@ -9,5 +9,8 @@ import java.util.List;
 
 @Service
 public interface NotificationService {
-    void createNotificationConnectionRequest(Long tutorId, String studentName, Long matchId);
+    void createNotificationConnectionRequest(Long tutorId, String studentName, Long matchId); // Crea una notificación
+    // de solicitud de conexión para el tutor.
+    void createNotificationConnectionAnswered(Long studentId, String tutorName, Long matchId, boolean isAccepted); // Crea una notificación
+    // de respuesta a la solicitud de conexión para el estudiante.
 }

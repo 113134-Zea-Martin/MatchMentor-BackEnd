@@ -1,13 +1,16 @@
 package com.scaffold.template.services.match;
 
+import com.scaffold.template.dtos.match.ConfirmedMatchResponseDTO;
 import com.scaffold.template.dtos.match.MatchResponseDTO;
 import com.scaffold.template.dtos.match.StudentPendingRequestMatchDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.MatchEntity;
+import com.scaffold.template.entities.Role;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.entities.Status;
 import com.scaffold.template.repositories.MatchRepository;
 import com.scaffold.template.services.UserService;
+import com.scaffold.template.services.chat.ChatService;
 import com.scaffold.template.services.notification.NotificationService;
 import com.scaffold.template.services.userViewedProfileService.UserViewedProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class MatchServiceImpl implements MatchService {
@@ -24,22 +28,20 @@ public class MatchServiceImpl implements MatchService {
     private final UserService userService;
     private final UserViewedProfileService userViewedProfileService;
     private final NotificationService notificationService;
+    private final ChatService chatService;
 
     @Autowired
     public MatchServiceImpl(MatchRepository matchRepository,
                             UserService userService,
                             UserViewedProfileService userViewedProfileService,
-                            NotificationService notificationService) {
+                            NotificationService notificationService,
+                            ChatService chatService) {
         this.matchRepository = matchRepository;
         this.userService = userService;
         this.userViewedProfileService = userViewedProfileService;
         this.notificationService = notificationService;
+        this.chatService = chatService;
     }
-
-//    @Override
-//    public List<UserEntity> findCompatibleTutors(Long userId) {
-//        return userRepository.findTutorsWithCommonInterests(userId);
-//    }
 
     @Override
     public List<Long> getIDsOfTutorsWithCommonInterests(Long userId) {
@@ -123,6 +125,60 @@ public class MatchServiceImpl implements MatchService {
                     return dto;
                 })
                 .toList();
+    }
+
+    public MatchEntity getMatchById(Long matchId) {
+        return matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
+    }
+
+    @Override
+    public MatchEntity acceptMatch(Long matchId, boolean isAccepted) {
+        MatchEntity match = getMatchById(matchId);
+        match.setStatus(isAccepted ? Status.ACCEPTED : Status.REJECTED);
+        match.setUpdatedAt(LocalDateTime.now());
+
+        // Create a welcome chat when the match is accepted
+        if (isAccepted) {
+            chatService.createWelcomeChat(matchId);
+        }
+
+        return matchRepository.save(match);
+    }
+
+    @Override
+    public List<MatchEntity> getMatchesByStatusAndUserId(Status status, Long userId) {
+        return matchRepository.findByStatusAndUserId(status, userId);
+    }
+
+    @Override
+    public ConfirmedMatchResponseDTO mapToConfirmedMatchResponseDTO(MatchEntity matchEntity, Long userId) {
+        ConfirmedMatchResponseDTO confirmedMatchResponseDTO = new ConfirmedMatchResponseDTO();
+        confirmedMatchResponseDTO.setId(matchEntity.getId());
+        Long responseUserId = Objects.equals(userId, matchEntity.getStudent().getId()) ? matchEntity.getTutor().getId() : matchEntity.getStudent().getId();
+        confirmedMatchResponseDTO.setUserId(responseUserId);
+
+        UserEntity responseUser = userService.getUserEntityById(responseUserId);
+
+        confirmedMatchResponseDTO.setFullName(responseUser.getFirstName() + " " + responseUser.getLastName());
+//        confirmedMatchResponseDTO.setRole(responseUser.getRole());
+
+        if (Objects.equals(userId, matchEntity.getStudent().getId())) {
+            confirmedMatchResponseDTO.setRole(Role.TUTOR);
+        } else {
+            confirmedMatchResponseDTO.setRole(Role.STUDENT);
+        }
+
+        if (!Objects.equals(userId, matchEntity.getStudent().getId())) {
+            confirmedMatchResponseDTO.setDescription(responseUser.getStudyArea());
+        } else {
+            confirmedMatchResponseDTO.setDescription(responseUser.getCurrentProfession());
+        }
+
+        confirmedMatchResponseDTO.setUpdatedAt(matchEntity.getUpdatedAt());
+        confirmedMatchResponseDTO.setIsActive(responseUser.getIsActive());
+
+        return confirmedMatchResponseDTO;
     }
 
 }

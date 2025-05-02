@@ -1,6 +1,7 @@
 package com.scaffold.template.controllers;
 
 import com.scaffold.template.dtos.ApiResponse;
+import com.scaffold.template.dtos.match.ConfirmedMatchResponseDTO;
 import com.scaffold.template.dtos.match.CreateMatchRequestDTO;
 import com.scaffold.template.dtos.match.MatchResponseDTO;
 import com.scaffold.template.dtos.match.StudentPendingRequestMatchDTO;
@@ -13,11 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -85,8 +88,65 @@ public class MatchController {
     @GetMapping("/pending-request/{tutorId}")
     public ResponseEntity<List<StudentPendingRequestMatchDTO>> getPendingRequestMatches(@PathVariable Long tutorId) {
         List<MatchEntity> matches = matchService.getMatchesByStatusAndTutorId(Status.PENDING, tutorId);
-        List<StudentPendingRequestMatchDTO> studentPendingRequestMatchDTOS = matchService.mapToStudentPendingRequestMatchDTOs(matches);
+        List<MatchEntity> matchesOrderedByIdDesc = matches.stream()
+                .sorted((m1, m2) -> Long.compare(m2.getId(), m1.getId()))
+                .toList();
+        List<StudentPendingRequestMatchDTO> studentPendingRequestMatchDTOS = matchService.mapToStudentPendingRequestMatchDTOs(matchesOrderedByIdDesc);
         return ResponseEntity.ok(studentPendingRequestMatchDTOS);
+    }
+
+    @PutMapping("/accept/{matchId}")
+    public ResponseEntity<ApiResponse> acceptMatch(@PathVariable Long matchId) {
+        ApiResponse response = new ApiResponse();
+        response.setTimestamp(LocalDateTime.now());
+        try {
+            MatchEntity match = matchService.acceptMatch(matchId, true);
+            MatchResponseDTO matchResponseDTO = matchService.mapToMatchResponseDTO(match);
+            response.setSuccess(true);
+            response.setStatusCode(200);
+            response.setData(matchResponseDTO);
+            response.setMessage("Match aceptado con éxito");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al aceptar el match: " + e.getMessage());
+            return ResponseEntity.status(200).body(response);
+        }
+    }
+
+    @PutMapping("/reject/{matchId}")
+    public ResponseEntity<ApiResponse> rejectMatch(@PathVariable Long matchId) {
+        ApiResponse response = new ApiResponse();
+        response.setTimestamp(LocalDateTime.now());
+        try {
+            MatchEntity match = matchService.acceptMatch(matchId, false);
+            MatchResponseDTO matchResponseDTO = matchService.mapToMatchResponseDTO(match);
+            response.setSuccess(true);
+            response.setStatusCode(200);
+            response.setData(matchResponseDTO);
+            response.setMessage("Match rechazado con éxito");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error al rechazar el match: " + e.getMessage());
+            return ResponseEntity.status(200).body(response);
+        }
+    }
+
+    @GetMapping("/confirmed/{userId}")
+    public ResponseEntity<List<ConfirmedMatchResponseDTO>> getConfirmedMatches(@PathVariable Long userId) {
+        List<MatchEntity> matches = matchService.getMatchesByStatusAndUserId(Status.ACCEPTED, userId);
+        List<ConfirmedMatchResponseDTO> confirmedMatches = new ArrayList<>();
+        for (MatchEntity match : matches) {
+            ConfirmedMatchResponseDTO confirmedMatch = matchService.mapToConfirmedMatchResponseDTO(match, userId);
+            if (confirmedMatch.getIsActive()) {
+                confirmedMatches.add(confirmedMatch);
+            }
+        }
+        confirmedMatches.sort((m1, m2) -> Long.compare(m2.getId(), m1.getId()));
+        return ResponseEntity.ok(confirmedMatches);
     }
 
 }
