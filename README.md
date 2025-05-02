@@ -12,6 +12,8 @@ Este proyecto proporciona un scaffolding inicial para aplicaciones Java Spring B
 - Estructura MVC (Model-View-Controller)
 - Respuestas API estandarizadas
 - Perfiles de usuario (Estudiante/Tutor)
+- Sistema de matches entre estudiantes y tutores
+- Gestión de estados de matches (pendiente, confirmado, rechazado)
 
 ## Estructura del proyecto
 
@@ -24,17 +26,26 @@ src/
 │   │           └── template/
 │   │               ├── controllers/
 │   │               │   ├── AuthController.java
-│   │               │   └── UserController.java
+│   │               │   ├── UserController.java
+│   │               │   └── MatchController.java
 │   │               ├── dtos/
-│   │               │   └── profile/
-│   │               │       ├── UserResponseDTO.java
-│   │               │       ├── StudentResponseDTO.java
-│   │               │       └── TutorResponseDTO.java
+│   │               │   ├── profile/
+│   │               │   │   ├── UserResponseDTO.java
+│   │               │   │   ├── StudentResponseDTO.java
+│   │               │   │   └── TutorResponseDTO.java
+│   │               │   └── match/
+│   │               │       └── ConfirmedMatchResponseDTO.java
 │   │               ├── entities/
-│   │               │   └── UserEntity.java
+│   │               │   ├── UserEntity.java
+│   │               │   ├── MatchEntity.java
+│   │               │   └── Status.java
+│   │               ├── repositories/
+│   │               │   ├── UserRepository.java
+│   │               │   └── MatchRepository.java
 │   │               ├── services/
 │   │               │   ├── AuthService.java
 │   │               │   ├── UserService.java
+│   │               │   ├── MatchService.java
 │   │               │   ├── PasswordResetTokenService.java
 │   │               │   └── email/
 │   │               │       └── EmailService.java
@@ -74,6 +85,28 @@ frontend.url=http://localhost:4200
 
 ### Administración
 - `GET /api/auth/users` - Obtener todos los usuarios (requiere autenticación)
+
+### Matches
+
+- `POST /api/matches/request/{tutorId}` - Solicitar match con un tutor específico
+- `GET /api/matches/pending` - Obtener matches pendientes para el usuario autenticado
+- `GET /api/matches/confirmed` - Obtener matches confirmados para el usuario autenticado
+- `PUT /api/matches/{matchId}/confirm` - Confirmar un match pendiente
+- `PUT /api/matches/{matchId}/reject` - Rechazar un match pendiente
+
+## Modelos principales
+
+### Usuario (UserEntity)
+Representa a los usuarios del sistema con sus roles específicos (STUDENT, TUTOR).
+
+### Match (MatchEntity)
+Representa la conexión entre un estudiante y un tutor:
+- Atributos principales: student, tutor, status, createdAt, updatedAt
+- Estados posibles (Status): PENDING, CONFIRMED, REJECTED
+
+### Respuesta de Match Confirmado (ConfirmedMatchResponseDTO)
+DTO que traslada la información de matches confirmados entre las capas de la aplicación:
+- Incluye: id, userId, fullName, role, description, updatedAt, isActive
 
 ## Requisitos
 
