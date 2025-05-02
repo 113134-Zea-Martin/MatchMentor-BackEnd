@@ -80,6 +80,7 @@ frontend.url=http://localhost:4200
 ### Usuarios
 
 - `GET /api/users/{profileId}` - Obtener perfil de usuario por ID
+- `PUT /api/users/{profileId}` - Actualizar perfil de usuario
 - `GET /api/users/me` - Obtener información del usuario autenticado
 - `GET /api/users/me/roles` - Obtener información específica según el rol del usuario (Estudiante/Tutor)
 
