@@ -252,7 +252,7 @@ public class DataInitializer {
                 UserEntity tutor3 = new UserEntity();
                 tutor3.setFirstName("Javier");
                 tutor3.setLastName("Mendoza");
-                tutor3.setEmail("javier.mendoza@example.com");
+                tutor3.setEmail("mzeacardenas@gmail.com");
                 tutor3.setPassword(passwordEncoder.encode("password123"));
                 tutor3.setBirthDate(LocalDate.of(1988, 7, 22));
                 tutor3.setLocation("Rosario");
@@ -402,7 +402,7 @@ public class DataInitializer {
                 MatchEntity match3 = new MatchEntity();
                 match3.setStudent(student3);
                 match3.setTutor(tutor3);
-                match3.setStatus(Status.PENDING);
+                match3.setStatus(Status.ACCEPTED);
                 match3.setCreatedAt(LocalDateTime.now().minusDays(1));
                 matchRepository.save(match3);
 
@@ -410,7 +410,7 @@ public class DataInitializer {
                 MatchEntity match4 = new MatchEntity();
                 match4.setStudent(student1);
                 match4.setTutor(tutor3);
-                match4.setStatus(Status.REJECTED);
+                match4.setStatus(Status.ACCEPTED);
                 match4.setCreatedAt(LocalDateTime.now().minusDays(7));
                 match4.setUpdatedAt(LocalDateTime.now().minusDays(6));
                 matchRepository.save(match4);

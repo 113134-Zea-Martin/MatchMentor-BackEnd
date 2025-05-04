@@ -54,4 +54,8 @@ public class ConfirmedMatchResponseDTO {
      * Este campo puede ser utilizado para determinar si el match sigue vigente.
      */
     private Boolean isActive;
+
+    private LocalDateTime lastMessageDate;
+
+    private Boolean hasUnreadMessages;
 }

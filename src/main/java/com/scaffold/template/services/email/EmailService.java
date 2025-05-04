@@ -34,6 +34,38 @@ public class EmailService {
         mailSender.send(mensaje);
     }
 
+    // Método para enviar un correo electrónico al tutor indicando que ha recibido una solicitud de match de un estudiante
+    @Async
+    public void sendMatchRequestEmail(String tutorEmail, String studentName) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(tutorEmail);
+        mensaje.setSubject("Solicitud de Match Recibida");
+        mensaje.setText(
+                "Hola,\n\n" +
+                        "Has recibido una solicitud de match de " + studentName + ".\n\n" +
+                        "Inicia sesión en tu cuenta para revisar la solicitud.\n\n" +
+                        "¡Gracias por ser parte de Mentor Match!\n\n" +
+                        "El equipo de Mentor Match\n");
+
+        mailSender.send(mensaje);
+    }
+
+    // Método para enviar un correo electrónico al estudiante indicando que su solicitud de match ha sido aceptada.
+    @Async
+    public void sendMatchAcceptedEmail(String studentEmail, String tutorName) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(studentEmail);
+        mensaje.setSubject("Solicitud de Match Aceptada");
+        mensaje.setText(
+                "Hola,\n\n" +
+                        "Tu solicitud de match ha sido aceptada por " + tutorName + ".\n\n" +
+                        "Inicia sesión en tu cuenta para ver los detalles.\n\n" +
+                        "¡Gracias por ser parte de Mentor Match!\n\n" +
+                        "El equipo de Mentor Match\n");
+
+        mailSender.send(mensaje);
+    }
+
     public void sendMail(String to, String subject, String body) {
         SimpleMailMessage mensaje = new SimpleMailMessage();
         mensaje.setTo(to);

@@ -145,7 +145,8 @@ public class MatchController {
                 confirmedMatches.add(confirmedMatch);
             }
         }
-        confirmedMatches.sort((m1, m2) -> Long.compare(m2.getId(), m1.getId()));
+//        confirmedMatches.sort((m1, m2) -> Long.compare(m2.getId(), m1.getId()));
+        confirmedMatches.sort((m1, m2) -> m2.getLastMessageDate().compareTo(m1.getLastMessageDate()));
         return ResponseEntity.ok(confirmedMatches);
     }
 

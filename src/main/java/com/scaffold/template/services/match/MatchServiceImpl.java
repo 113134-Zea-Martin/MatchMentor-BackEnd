@@ -11,6 +11,7 @@ import com.scaffold.template.entities.Status;
 import com.scaffold.template.repositories.MatchRepository;
 import com.scaffold.template.services.UserService;
 import com.scaffold.template.services.chat.ChatService;
+import com.scaffold.template.services.email.EmailService;
 import com.scaffold.template.services.notification.NotificationService;
 import com.scaffold.template.services.userViewedProfileService.UserViewedProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +30,21 @@ public class MatchServiceImpl implements MatchService {
     private final UserViewedProfileService userViewedProfileService;
     private final NotificationService notificationService;
     private final ChatService chatService;
+    private final EmailService emailService;
 
     @Autowired
     public MatchServiceImpl(MatchRepository matchRepository,
                             UserService userService,
                             UserViewedProfileService userViewedProfileService,
                             NotificationService notificationService,
-                            ChatService chatService) {
+                            ChatService chatService,
+                            EmailService emailService) {
         this.matchRepository = matchRepository;
         this.userService = userService;
         this.userViewedProfileService = userViewedProfileService;
         this.notificationService = notificationService;
         this.chatService = chatService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -82,6 +86,7 @@ public class MatchServiceImpl implements MatchService {
                     student.getFirstName(),
                     savedMatch.getId()
             );
+            emailService.sendMatchRequestEmail(tutor.getEmail(), student.getFirstName());
         }
 
         return savedMatch;
@@ -140,7 +145,8 @@ public class MatchServiceImpl implements MatchService {
 
         // Create a welcome chat when the match is accepted
         if (isAccepted) {
-            chatService.createWelcomeChat(matchId);
+//            chatService.createWelcomeChat(matchId);
+            emailService.sendMatchAcceptedEmail(match.getStudent().getEmail(), match.getTutor().getFirstName());
         }
 
         return matchRepository.save(match);
@@ -153,6 +159,9 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public ConfirmedMatchResponseDTO mapToConfirmedMatchResponseDTO(MatchEntity matchEntity, Long userId) {
+
+        LocalDateTime lastMessageDate = chatService.getLastMessageDate(matchEntity.getId());
+
         ConfirmedMatchResponseDTO confirmedMatchResponseDTO = new ConfirmedMatchResponseDTO();
         confirmedMatchResponseDTO.setId(matchEntity.getId());
         Long responseUserId = Objects.equals(userId, matchEntity.getStudent().getId()) ? matchEntity.getTutor().getId() : matchEntity.getStudent().getId();
@@ -177,6 +186,16 @@ public class MatchServiceImpl implements MatchService {
 
         confirmedMatchResponseDTO.setUpdatedAt(matchEntity.getUpdatedAt());
         confirmedMatchResponseDTO.setIsActive(responseUser.getIsActive());
+
+        if (lastMessageDate != null) {
+            confirmedMatchResponseDTO.setLastMessageDate(lastMessageDate);
+        } else {
+            confirmedMatchResponseDTO.setLastMessageDate(matchEntity.getCreatedAt());
+        }
+
+        Boolean existsUnreadMessage = chatService.existsByMatchIdAndSenderIdAndIsReadFalse(matchEntity.getId(), responseUserId);
+
+        confirmedMatchResponseDTO.setHasUnreadMessages(existsUnreadMessage);
 
         return confirmedMatchResponseDTO;
     }
