@@ -9,6 +9,7 @@ import com.scaffold.template.entities.Role;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.entities.Status;
 import com.scaffold.template.repositories.MatchRepository;
+import com.scaffold.template.services.InterestService;
 import com.scaffold.template.services.UserService;
 import com.scaffold.template.services.chat.ChatService;
 import com.scaffold.template.services.email.EmailService;
@@ -31,6 +32,7 @@ public class MatchServiceImpl implements MatchService {
     private final NotificationService notificationService;
     private final ChatService chatService;
     private final EmailService emailService;
+    private final InterestService interestService;
 
     @Autowired
     public MatchServiceImpl(MatchRepository matchRepository,
@@ -38,13 +40,15 @@ public class MatchServiceImpl implements MatchService {
                             UserViewedProfileService userViewedProfileService,
                             NotificationService notificationService,
                             ChatService chatService,
-                            EmailService emailService) {
+                            EmailService emailService,
+                            InterestService interestService) {
         this.matchRepository = matchRepository;
         this.userService = userService;
         this.userViewedProfileService = userViewedProfileService;
         this.notificationService = notificationService;
         this.chatService = chatService;
         this.emailService = emailService;
+        this.interestService = interestService;
     }
 
     @Override
@@ -78,6 +82,16 @@ public class MatchServiceImpl implements MatchService {
         match.setTutor(tutor);
         match.setStatus(isAccepted ? Status.PENDING : Status.REJECTED);
         match.setCreatedAt(LocalDateTime.now());
+
+        List<Long> commonInterests = new ArrayList<>();
+        student.getUserInterests().forEach(interest -> {
+            if (tutor.getUserInterests().stream()
+                    .anyMatch(tutorInterest -> tutorInterest.getInterest().getId().equals(interest.getInterest().getId()))) {
+                commonInterests.add(interest.getInterest().getId());
+            }
+        });
+        match.setCommonInterests(commonInterests);
+
         MatchEntity savedMatch = matchRepository.save(match);
 
         if (isAccepted) {
@@ -148,6 +162,7 @@ public class MatchServiceImpl implements MatchService {
 //            chatService.createWelcomeChat(matchId);
             emailService.sendMatchAcceptedEmail(match.getStudent().getEmail(), match.getTutor().getFirstName());
         }
+        notificationService.createNotificationConnectionAnswered(match.getStudent().getId(), match.getTutor().getFirstName(), match.getId(), isAccepted);
 
         return matchRepository.save(match);
     }
@@ -197,7 +212,22 @@ public class MatchServiceImpl implements MatchService {
 
         confirmedMatchResponseDTO.setHasUnreadMessages(existsUnreadMessage);
 
+        List<String> commonInterests = new ArrayList<>();
+        matchEntity.getCommonInterests().forEach(interestId -> {
+            String interestName = interestService.getById(interestId).getName();
+            if (interestName != null) {
+                commonInterests.add(interestName);
+            }
+        });
+        confirmedMatchResponseDTO.setCommonInterests(commonInterests);
+
         return confirmedMatchResponseDTO;
+    }
+
+    @Override
+    public MatchEntity getMatchEntityById(Long matchId) {
+        return matchRepository.findById(matchId)
+                .orElseThrow(() -> new RuntimeException("Match not found"));
     }
 
 }

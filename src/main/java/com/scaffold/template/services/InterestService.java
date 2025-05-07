@@ -11,4 +11,5 @@ public interface InterestService {
      List<InterestRequestDTO> getAllInterests();
      InterestEntity createInterest(InterestRequestDTO interestRequestDTO);
      InterestEntity getByName(String name);
+     InterestEntity getById(Long id);
 }

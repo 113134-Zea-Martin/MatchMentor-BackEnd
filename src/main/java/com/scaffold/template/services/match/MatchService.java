@@ -88,4 +88,7 @@ public interface MatchService {
 
     ConfirmedMatchResponseDTO mapToConfirmedMatchResponseDTO(MatchEntity matchEntity, Long userId);//El userId
     // corresponde al usuario que solicita los chats.
+
+
+    MatchEntity getMatchEntityById(Long matchId);
 }

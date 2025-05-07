@@ -13,4 +13,6 @@ public interface NotificationService {
     // de solicitud de conexión para el tutor.
     void createNotificationConnectionAnswered(Long studentId, String tutorName, Long matchId, boolean isAccepted); // Crea una notificación
     // de respuesta a la solicitud de conexión para el estudiante.
+
+    void createNotificationMeetingRequest(Long studentId, String tutorName, Long matchId); // Crea una notificación
 }

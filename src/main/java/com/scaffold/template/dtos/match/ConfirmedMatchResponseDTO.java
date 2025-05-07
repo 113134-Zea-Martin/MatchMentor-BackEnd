@@ -6,6 +6,7 @@ import com.scaffold.template.entities.Status;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO (Data Transfer Object) que representa la información de un match confirmado.
@@ -58,4 +59,6 @@ public class ConfirmedMatchResponseDTO {
     private LocalDateTime lastMessageDate;
 
     private Boolean hasUnreadMessages;
+
+    private List<String> commonInterests;
 }

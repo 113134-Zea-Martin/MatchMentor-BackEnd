@@ -47,4 +47,9 @@ public class InterestServiceImpl implements InterestService {
     public InterestEntity getByName(String name) {
         return interestRepository.findByName(name);
     }
+
+    @Override
+    public InterestEntity getById(Long id) {
+        return interestRepository.findById(id).orElse(null);
+    }
 }

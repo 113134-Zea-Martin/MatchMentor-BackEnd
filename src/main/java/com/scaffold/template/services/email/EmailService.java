@@ -73,4 +73,22 @@ public class EmailService {
         mensaje.setText(body);
         mailSender.send(mensaje);
     }
+
+    // Método para enviar un correo electrónico al estudiante indicando que el tutor ha creado una reunión.
+    @Async
+    public void sendMeetingCreatedEmail(String studentEmail, String tutorName, String meetingDate, String meetingTime) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(studentEmail);
+        mensaje.setSubject("Reunión Programada");
+        mensaje.setText(
+                "Hola,\n\n" +
+                        "Tu tutor " + tutorName + " ha programado una reunión para ti.\n\n" +
+                        "Fecha: " + meetingDate + "\n" +
+                        "Hora: " + meetingTime + "\n\n" +
+                        "Inicia sesión en tu cuenta para ver los detalles.\n\n" +
+                        "¡Gracias por ser parte de Mentor Match!\n\n" +
+                        "El equipo de Mentor Match\n");
+
+        mailSender.send(mensaje);
+    }
 }
