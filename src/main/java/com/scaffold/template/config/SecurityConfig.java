@@ -36,19 +36,20 @@ public class SecurityConfig {
                 // Deshabilitar frameOptions para permitir que H2 Console funcione
                 .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register/user"
+                                .requestMatchers("/api/auth/login", "/api/auth/register/user"
 //                                , "/api/auth/users"
-                        ).permitAll()
-                        // Corregir el patrón para H2 Console
-                        .requestMatchers("/h2-console/**").permitAll()
-                        // Rutas de Swagger
-                        .requestMatchers("/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**").permitAll()
-                        .requestMatchers("/api/auth/request-reset", "/api/auth/reset-password**").permitAll()
-//                        .anyRequest().authenticated()
+                                ).permitAll()
+                                .requestMatchers("/ws/**", "/ws/info", "/topic/**").permitAll() // Permitir conexiones WebSocket inicial
+                                // Corregir el patrón para H2 Console
+                                .requestMatchers("/h2-console/**").permitAll()
+                                // Rutas de Swagger
+                                .requestMatchers("/v3/api-docs/**",
+                                        "/swagger-ui/**",
+                                        "/swagger-ui.html",
+                                        "/swagger-resources/**",
+                                        "/webjars/**").permitAll()
+                                .requestMatchers("/api/auth/request-reset", "/api/auth/reset-password**").permitAll()
+//                                .anyRequest().authenticated()
                                 .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -214,4 +214,5 @@ public class UserServiceImpl implements UserService {
     public List<UserEntity> findTutorsWithCommonInterests(Long userId) {
         return userRepository.findTutorsWithCommonInterests(userId);
     }
+
 }

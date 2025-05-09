@@ -146,14 +146,9 @@ public class MatchServiceImpl implements MatchService {
                 .toList();
     }
 
-    public MatchEntity getMatchById(Long matchId) {
-        return matchRepository.findById(matchId)
-                .orElseThrow(() -> new RuntimeException("Match not found"));
-    }
-
     @Override
     public MatchEntity acceptMatch(Long matchId, boolean isAccepted) {
-        MatchEntity match = getMatchById(matchId);
+        MatchEntity match = this.getMatchEntityById(matchId);
         match.setStatus(isAccepted ? Status.ACCEPTED : Status.REJECTED);
         match.setUpdatedAt(LocalDateTime.now());
 

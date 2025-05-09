@@ -9,12 +9,15 @@ import com.scaffold.template.services.UserService;
 import com.scaffold.template.services.email.EmailService;
 import com.scaffold.template.services.match.MatchService;
 import com.scaffold.template.services.notification.NotificationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 @Service
 public class MeetingServiceImpl implements MeetingService {
 
+    private static final Logger log = LoggerFactory.getLogger(MeetingServiceImpl.class);
     private final MeetingRepository meetingRepository;
     private final UserService userService;
     private final MatchService matchService;
@@ -88,13 +92,13 @@ public class MeetingServiceImpl implements MeetingService {
             }
         }
 
-        // Check if the mentor has a proposed or accepted meeting at the specified date and time
+        // Check si el mentor ya tiene una reunión propuesta o aceptada en la fecha y hora especificadas
         if (meetingRepository.existsByMentorIdAndDateAndTimeAndStatus(mentorId, date, time, MeetingEntity.MeetingStatus.PROPOSED) ||
                 meetingRepository.existsByMentorIdAndDateAndTimeAndStatus(mentorId, date, time, MeetingEntity.MeetingStatus.ACCEPTED)) {
             throw new IllegalArgumentException("Ya existe una reunión propuesta o aceptada para el mentor en la fecha y hora especificadas");
         }
 
-        // Check if the student has an accepted meeting at the specified date and time
+        // Check si el estudiante ya tiene una reunión aceptada en la fecha y hora especificadas
         if (meetingRepository.existsByStudentIdAndDateAndTimeAndStatus(studentId, date, time, MeetingEntity.MeetingStatus.ACCEPTED)) {
             throw new IllegalArgumentException("Ya existe una reunión aceptada para el estudiante en la fecha y hora especificadas");
         }
@@ -102,7 +106,7 @@ public class MeetingServiceImpl implements MeetingService {
         // Calcular la hora de fin para la nueva reunión
         LocalTime endTime = time.plusHours(duration);
 
-// Verificar si hay reuniones solapadas para el mentor
+        // Verificar si hay reuniones solapadas para el mentor
         List<MeetingEntity.MeetingStatus> activeStatuses = Arrays.asList(
                 MeetingEntity.MeetingStatus.PROPOSED,
                 MeetingEntity.MeetingStatus.ACCEPTED
@@ -113,7 +117,7 @@ public class MeetingServiceImpl implements MeetingService {
                 .collect(Collectors.toList());
 
 
-// Puedes hacer la misma validación para el estudiante si es necesario
+        // Puedes hacer la misma validación para el estudiante si es necesario
 
         // Validate the student and mentor IDs
         UserEntity student = userService.getUserEntityById(studentId);
@@ -143,8 +147,12 @@ public class MeetingServiceImpl implements MeetingService {
         // Optionally, you can add logic to send notifications or perform other actions here
         // For example, you can create a notification for the student
         notificationService.createNotificationMeetingRequest(studentId, mentor.getFirstName(), matchId);
+
+        // Formatear la fecha a "dd/MM/yyyy", por ejemplo "08/05/2023"
+        String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
         // Email the student about the meeting request
-        emailService.sendMeetingCreatedEmail(student.getEmail(), mentor.getFirstName(), date.toString(), time.toString());
+        emailService.sendMeetingCreatedEmail(student.getEmail(), mentor.getFirstName(), formattedDate, time.toString());
 
         // Return the created meeting
 

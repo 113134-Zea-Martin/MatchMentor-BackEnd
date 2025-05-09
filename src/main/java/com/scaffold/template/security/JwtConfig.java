@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -65,7 +64,7 @@ public class JwtConfig {
         // Aquí puedes agregar cualquier claim adicional que desees incluir en el token
         // Por ejemplo:
         // claims.put("role", userDetails.getAuthorities());
-//        Map<String, Object> claims = new HashMap<>();
+        // Map<String, Object> claims = new HashMap<>();
 
         return createToken(claims, userDetails.getUsername());
     }

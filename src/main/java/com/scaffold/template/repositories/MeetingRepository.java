@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface MeetingRepository extends JpaRepository<MeetingEntity, Long> {
-
     boolean existsByMentorIdAndDateAndTimeAndStatus(Long mentorId, LocalDate date, LocalTime time, MeetingEntity.MeetingStatus status);
     boolean existsByStudentIdAndDateAndTimeAndStatus(Long studentId, LocalDate date, LocalTime time, MeetingEntity.MeetingStatus status);
     List<MeetingEntity> findByMentorIdAndDateAndStatusIn(Long mentorId, LocalDate date, List<MeetingEntity.MeetingStatus> statuses);
