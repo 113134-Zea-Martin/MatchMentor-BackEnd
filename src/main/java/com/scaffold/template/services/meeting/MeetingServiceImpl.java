@@ -1,6 +1,7 @@
 package com.scaffold.template.services.meeting;
 
 import com.scaffold.template.dtos.meeting.CreateMeetingRequestDTO;
+import com.scaffold.template.dtos.meeting.MeetingHistoryResponseDTO;
 import com.scaffold.template.entities.MatchEntity;
 import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.entities.UserEntity;
@@ -169,5 +170,47 @@ public class MeetingServiceImpl implements MeetingService {
         dto.setDuration(meeting.getDuration());
         dto.setReason(meeting.getReason());
         return dto;
+    }
+
+    public List<MeetingEntity> getMeetingHistory(Long userId) {
+        List<MeetingEntity> meetings = meetingRepository.findByStudentIdOrMentorId(userId, userId);
+        if (meetings.isEmpty()) {
+            throw new IllegalArgumentException("No se encontraron reuniones para el usuario con ID: " + userId);
+        }
+
+        for (MeetingEntity meeting : meetings) {
+            if (meeting.getStudent().getId().equals(userId)) {
+                meeting.setStudent(null);
+            } else {
+                meeting.setMentor(null);
+            }
+        }
+
+        return meetings;
+    }
+
+    public MeetingHistoryResponseDTO mapToMeetingHistoryResponseDTO(MeetingEntity meeting) {
+        MeetingHistoryResponseDTO dto = new MeetingHistoryResponseDTO();
+        dto.setDate(meeting.getDate());
+        dto.setTime(meeting.getTime());
+        dto.setDuration(meeting.getDuration());
+
+        dto.setOtherParticipantName(meeting.getStudent() != null ?
+                meeting.getStudent().getFirstName() + ' ' + meeting.getStudent().getLastName() :
+                meeting.getMentor().getFirstName() + ' ' + meeting.getMentor().getLastName());
+
+        dto.setMyRole(meeting.getStudent() == null ? "Estudiante" : "Mentor");
+
+        dto.setReason(meeting.getReason());
+        dto.setStatus(meeting.getStatus());
+        return dto;
+    }
+
+    @Override
+    public List<MeetingHistoryResponseDTO> getMeetingHistoryResponseDTO(Long userId) {
+        List<MeetingEntity> meetings = getMeetingHistory(userId);
+        return meetings.stream()
+                .map(this::mapToMeetingHistoryResponseDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -184,4 +184,10 @@ public class UserEntity {
      */
     private Boolean isActive;
 
+    /**
+     * Token de mercado pago del usuario.
+     * Campo opcional.
+     */
+    private String mercadoPagoToken;
+
 }

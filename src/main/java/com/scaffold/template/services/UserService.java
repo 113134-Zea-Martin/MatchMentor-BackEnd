@@ -18,4 +18,5 @@ public interface UserService {
     UserResponseDTO updateUser(Long id, UpdateUserRequestDTO updateUserRequestDTO);
     UserEntity getUserEntityById(Long id);
     List<UserEntity> findTutorsWithCommonInterests(Long userId);
+    void setMercadoPagoToken(Long userId, String token);
 }

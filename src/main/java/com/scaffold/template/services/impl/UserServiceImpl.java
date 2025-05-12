@@ -215,4 +215,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.findTutorsWithCommonInterests(userId);
     }
 
+    @Override
+    public void setMercadoPagoToken(Long userId, String token) {
+        UserEntity userEntity = this.getUserEntityById(userId);
+        userEntity.setMercadoPagoToken(token);
+        userRepository.save(userEntity);
+    }
+
 }
