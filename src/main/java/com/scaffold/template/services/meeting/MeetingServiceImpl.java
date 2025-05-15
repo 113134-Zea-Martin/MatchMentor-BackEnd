@@ -142,12 +142,14 @@ public class MeetingServiceImpl implements MeetingService {
         meeting.setStatus(MeetingEntity.MeetingStatus.PROPOSED);
         meeting.setCreatedAt(LocalDateTime.now());
 
+        meeting.setHourlyRate(mentor.getHourlyRate());
+
         // Save the meeting to the database
-        meetingRepository.save(meeting);
+        MeetingEntity meetingCreated = meetingRepository.save(meeting);
 
         // Optionally, you can add logic to send notifications or perform other actions here
         // For example, you can create a notification for the student
-        notificationService.createNotificationMeetingRequest(studentId, mentor.getFirstName(), matchId);
+        notificationService.createNotificationMeetingRequest(studentId, mentor.getFirstName(), meetingCreated.getId());
 
         // Formatear la fecha a "dd/MM/yyyy", por ejemplo "08/05/2023"
         String formattedDate = date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -191,6 +193,7 @@ public class MeetingServiceImpl implements MeetingService {
 
     public MeetingHistoryResponseDTO mapToMeetingHistoryResponseDTO(MeetingEntity meeting) {
         MeetingHistoryResponseDTO dto = new MeetingHistoryResponseDTO();
+        dto.setId(meeting.getId());
         dto.setDate(meeting.getDate());
         dto.setTime(meeting.getTime());
         dto.setDuration(meeting.getDuration());
@@ -203,6 +206,7 @@ public class MeetingServiceImpl implements MeetingService {
 
         dto.setReason(meeting.getReason());
         dto.setStatus(meeting.getStatus());
+        dto.setCost(meeting.getHourlyRate() * meeting.getDuration());
         return dto;
     }
 
@@ -212,5 +216,31 @@ public class MeetingServiceImpl implements MeetingService {
         return meetings.stream()
                 .map(this::mapToMeetingHistoryResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void respondToMeeting(Long meetingId, boolean isAccepted) {
+        MeetingEntity meeting = meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Reunión no encontrada con ID: " + meetingId));
+
+        meeting.setStatus(isAccepted ? MeetingEntity.MeetingStatus.ACCEPTED : MeetingEntity.MeetingStatus.REJECTED);
+
+        Long mentorId = meeting.getMentor().getId();
+        String studentName = meeting.getStudent().getFirstName() + " " + meeting.getStudent().getLastName();
+        notificationService.createNotificationMeetingAnswered(meetingId,mentorId, studentName, isAccepted);
+
+        // Email the mentor about the meeting response
+        String message = isAccepted ? "La reunión ha sido aceptada" : "La reunión ha sido rechazada";
+        emailService.sendMeetingResponseEmail(meeting.getMentor().getEmail(), studentName, isAccepted);
+
+        meeting.setUpdatedAt(LocalDateTime.now());
+
+        meetingRepository.save(meeting);
+    }
+
+    @Override
+    public MeetingEntity getMeetingById(Long meetingId) {
+        return meetingRepository.findById(meetingId)
+                .orElseThrow(() -> new IllegalArgumentException("Reunión no encontrada con ID: " + meetingId));
     }
 }

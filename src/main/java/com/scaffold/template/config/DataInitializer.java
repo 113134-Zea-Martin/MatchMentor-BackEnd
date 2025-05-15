@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class DataInitializer {
             InterestRepository interestRepository,
             MatchRepository matchRepository,
             NotificationRepository notificationRepository,
-            UserViewedProfileRepository userViewedProfileRepository) {
+            UserViewedProfileRepository userViewedProfileRepository, MeetingRepository meetingRepository) {
         return args -> {
             // Verificar si ya existen usuarios para evitar duplicados
             if (userRepository.count() == 0) {
@@ -267,6 +268,7 @@ public class DataInitializer {
                 tutor3.setIsActive(true);
                 tutor3.setIsVisible(true);
                 tutor3.setCreatedAt(LocalDateTime.now());
+                tutor3.setMercadoPagoToken("APP_USR-1481730718147445-051422-da44d4d99ae7069649fadfec9a22621c-2428775243");
 
                 // Intereses para el tutor 3
                 List<UserInterestEntity> tutor3Interests = new ArrayList<>();
@@ -457,6 +459,20 @@ public class DataInitializer {
                 notification4.setCreatedAt(LocalDateTime.now().minusDays(6));
 //                notification4.setReadAt(LocalDateTime.now().minusDays(6).plusHours(1));
                 notificationRepository.save(notification4);
+
+                // Meeting entre estudiante 1 y tutor 6
+                MeetingEntity meeting = new MeetingEntity();
+                meeting.setDate(LocalDate.now());
+                meeting.setDuration(1);
+                meeting.setHourlyRate(50.0);
+                meeting.setTime(LocalTime.of(10, 0));
+                meeting.setCreatedAt(LocalDateTime.now());
+                meeting.setMatch(match4);
+                meeting.setMentor(tutor3);
+                meeting.setStudent(student1);
+                meeting.setReason("Consulta sobre desarrollo de software");
+                meeting.setStatus(MeetingEntity.MeetingStatus.PROPOSED);
+                meetingRepository.save(meeting);
 
                 System.out.println("Datos iniciales cargados correctamente en todas las tablas");
             }

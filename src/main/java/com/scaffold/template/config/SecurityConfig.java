@@ -49,8 +49,8 @@ public class SecurityConfig {
                                         "/swagger-resources/**",
                                         "/webjars/**").permitAll()
                                 .requestMatchers("/api/auth/request-reset", "/api/auth/reset-password**").permitAll()
-                                .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
+//                                .anyRequest().authenticated()
+                                .anyRequest().permitAll()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

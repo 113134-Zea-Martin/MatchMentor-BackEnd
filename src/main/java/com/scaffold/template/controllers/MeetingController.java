@@ -3,7 +3,6 @@ package com.scaffold.template.controllers;
 import com.scaffold.template.dtos.ApiResponse;
 import com.scaffold.template.dtos.meeting.CreateMeetingRequestDTO;
 import com.scaffold.template.dtos.meeting.MeetingHistoryResponseDTO;
-import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.services.meeting.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +10,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,4 +67,21 @@ public class MeetingController {
         return ResponseEntity.status(200).body(response);
     }
 
+    // Responer a reunión
+    @PutMapping("/response/{meetingId}/{status}")
+    public ResponseEntity<ApiResponse> respondToMeeting(@PathVariable Long meetingId, @PathVariable boolean status) {
+        ApiResponse response = new ApiResponse();
+        response.setTimestamp(LocalDateTime.now());
+        try {
+            meetingService.respondToMeeting(meetingId, status);
+            response.setSuccess(true);
+            response.setStatusCode(200);
+            response.setMessage("Reunión respondida con éxito");
+        } catch (Exception e) {
+            response.setSuccess(false);
+            response.setStatusCode(500);
+            response.setMessage("Error: " + e.getMessage());
+        }
+        return ResponseEntity.status(200).body(response);
+    }
 }

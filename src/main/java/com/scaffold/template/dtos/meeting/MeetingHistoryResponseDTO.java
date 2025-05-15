@@ -9,6 +9,9 @@ import java.time.LocalTime;
 
 @Data
 public class MeetingHistoryResponseDTO {
+
+    private Long id; // ID de la reunión
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate date;
 
@@ -24,4 +27,5 @@ public class MeetingHistoryResponseDTO {
     private String myRole; // Rol del usuario en la reunión (estudiante o mentor)
     private String reason;
     private MeetingEntity.MeetingStatus status;
+    private double cost; // Costo de la reunión
 }

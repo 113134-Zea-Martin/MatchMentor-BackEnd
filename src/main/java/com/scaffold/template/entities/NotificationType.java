@@ -5,7 +5,9 @@ public enum NotificationType {
     CONNECTION_ACCEPTED, //El tutor ha aceptado la solicitud de conexión del estudiante.
     CONNECTION_REJECTED, //El tutor ha rechazado la solicitud de conexión del estudiante.
 
-    MEETING_REQUEST, //El estudiante ha solicitado una reunión con el tutor.
+    MEETING_REQUEST, //El tutor ha solicitado una reunión con el estudiante.
+    MEETING_ACCEPTED, //El estudiante ha aceptado la solicitud de reunión del tutor.
+    MEETING_REJECTED, //El estudiante ha rechazado la solicitud de reunión del tutor.
 
     NEW_MESSAGE, //Un estudiante o un tutor envía un nuevo mensaje a través del sistema de chat de la plataforma.
     MENTORSHIP_REMINDER, //Recordatorio de la próxima sesión de mentoría.

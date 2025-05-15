@@ -1,10 +1,8 @@
 package com.scaffold.template.services.notification;
 
-import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.entities.NotificationEntity;
 import com.scaffold.template.entities.NotificationType;
 import com.scaffold.template.repositories.NotificationRepository;
-import com.scaffold.template.services.meeting.MeetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -45,14 +43,26 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void createNotificationMeetingRequest(Long studentId, String tutorName, Long matchId) {
+    public void createNotificationMeetingRequest(Long studentId, String tutorName, Long meetingId) {
         NotificationEntity notification = new NotificationEntity();
         notification.setUserId(studentId);
         notification.setNotificationType(NotificationType.MEETING_REQUEST);
         notification.setMessage("Tienes una nueva solicitud de reunión con " + tutorName + "!");
         notification.setCreatedAt(LocalDateTime.now());
         notification.setIsRead(false);
-        notification.setRelatedEntityId(matchId);
+        notification.setRelatedEntityId(meetingId);
+        notificationRepository.save(notification);
+    }
+
+    @Override
+    public void createNotificationMeetingAnswered(Long meetingId, Long mentorId, String studentName, boolean isAccepted) {
+        NotificationEntity notification = new NotificationEntity();
+        notification.setUserId(mentorId);
+        notification.setNotificationType(isAccepted ? NotificationType.MEETING_ACCEPTED : NotificationType.MEETING_REJECTED);
+        notification.setMessage("La solicitud de reunión con " + studentName + (isAccepted ? " ha sido aceptada!" : " ha sido rechazada!"));
+        notification.setCreatedAt(LocalDateTime.now());
+        notification.setIsRead(false);
+        notification.setRelatedEntityId(meetingId);
         notificationRepository.save(notification);
     }
 }

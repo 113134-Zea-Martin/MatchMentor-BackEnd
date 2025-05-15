@@ -91,4 +91,21 @@ public class EmailService {
 
         mailSender.send(mensaje);
     }
+
+    // Método para enviar un correo electrónico al tutor indicando la respuesta del estudiante a la reunión.
+    @Async
+    public void sendMeetingResponseEmail(String tutorEmail, String studentName, boolean isAccepted) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+        mensaje.setTo(tutorEmail);
+        mensaje.setSubject("Respuesta a la Solicitud de Reunión");
+        mensaje.setText(
+                "Hola,\n\n" +
+                        "El estudiante " + studentName + " ha " + (isAccepted ? "aceptado" : "rechazado") + " tu solicitud de reunión.\n\n" +
+                        "Inicia sesión en tu cuenta para ver los detalles.\n\n" +
+                        "¡Gracias por ser parte de Mentor Match!\n\n" +
+                        "El equipo de Mentor Match\n");
+
+        mailSender.send(mensaje);
+    }
+
 }

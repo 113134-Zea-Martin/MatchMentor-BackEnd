@@ -105,6 +105,8 @@ public class MeetingEntity {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
 
+    private double hourlyRate;
+
     /**
      * Enum representing the possible statuses of a meeting.
      */

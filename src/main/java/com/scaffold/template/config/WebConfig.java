@@ -16,7 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
 
 
     @Value("${mercadopago.redirect.url.origin}")
-    private String url;
+    private String frontEndUrl;
+
+    @Value("${backend.url}")
+    private String backEndUrl;
+
+    private String mercadoPagoUrl = "https://www.mercadopago.com.ar";
 
     /**
      * Tiempo máximo en segundos para que las respuestas CORS sean almacenadas en caché por los navegadores.
@@ -41,9 +46,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         String localUrl = "http://localhost:4200";
-        String ngrokUrl = url;
         registry.addMapping("/**")
-                .allowedOrigins(ngrokUrl, localUrl)
+                .allowedOrigins(frontEndUrl, localUrl, backEndUrl, mercadoPagoUrl)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .exposedHeaders("Access-Control-Allow-Origin", "Authorization")

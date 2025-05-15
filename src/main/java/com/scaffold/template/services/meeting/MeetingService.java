@@ -14,4 +14,8 @@ public interface MeetingService {
 
     CreateMeetingRequestDTO createMeeting(Long studentId, Long mentorId, Long matchId, LocalDate date, LocalTime time, int duration, String reason);
     List<MeetingHistoryResponseDTO> getMeetingHistoryResponseDTO(Long userId);
+
+    void respondToMeeting(Long meetingId, boolean status);
+
+    MeetingEntity getMeetingById(Long meetingId);
 }
