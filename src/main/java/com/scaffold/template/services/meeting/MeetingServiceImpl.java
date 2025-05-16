@@ -229,8 +229,6 @@ public class MeetingServiceImpl implements MeetingService {
         String studentName = meeting.getStudent().getFirstName() + " " + meeting.getStudent().getLastName();
         notificationService.createNotificationMeetingAnswered(meetingId,mentorId, studentName, isAccepted);
 
-        // Email the mentor about the meeting response
-        String message = isAccepted ? "La reunión ha sido aceptada" : "La reunión ha sido rechazada";
         emailService.sendMeetingResponseEmail(meeting.getMentor().getEmail(), studentName, isAccepted);
 
         meeting.setUpdatedAt(LocalDateTime.now());

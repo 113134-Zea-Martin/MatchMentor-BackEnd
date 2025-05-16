@@ -1,13 +1,11 @@
 package com.scaffold.template.controllers;
 
-import com.mercadopago.MercadoPagoConfig;
-import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
-import com.mercadopago.resources.payment.Payment;
 import com.scaffold.template.dtos.MercadoPagoNotificationDTO;
 import com.scaffold.template.services.payment.PaymentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,8 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-
-
 
     private final PaymentServiceImpl paymentService;
 
@@ -34,8 +30,9 @@ public class PaymentController {
     }
 
     @PostMapping("/mercadopago/notification")
-    public void notification(@RequestBody MercadoPagoNotificationDTO notification) {
+    public ResponseEntity notification(@RequestBody MercadoPagoNotificationDTO notification) {
         paymentService.createPayment(notification);
+        return ResponseEntity.ok().build();
     }
 
 }

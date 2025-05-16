@@ -67,16 +67,17 @@ public class MeetingController {
         return ResponseEntity.status(200).body(response);
     }
 
-    // Responer a reunión
-    @PutMapping("/response/{meetingId}/{status}")
-    public ResponseEntity<ApiResponse> respondToMeeting(@PathVariable Long meetingId, @PathVariable boolean status) {
+    // Rechazar una reunión
+    @PutMapping("/reject/{meetingId}")
+    public ResponseEntity<ApiResponse> rejectMeeting(@PathVariable Long meetingId) {
         ApiResponse response = new ApiResponse();
         response.setTimestamp(LocalDateTime.now());
+        boolean status = false;
         try {
             meetingService.respondToMeeting(meetingId, status);
             response.setSuccess(true);
             response.setStatusCode(200);
-            response.setMessage("Reunión respondida con éxito");
+            response.setMessage("Se rechazó la reunión con éxito");
         } catch (Exception e) {
             response.setSuccess(false);
             response.setStatusCode(500);

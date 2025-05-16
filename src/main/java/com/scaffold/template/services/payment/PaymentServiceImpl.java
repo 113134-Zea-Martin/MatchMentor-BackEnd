@@ -112,6 +112,12 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentEntity.setDate(payment.getDateCreated().toLocalDateTime().plusHours(1));
 
                 paymentRepository.save(paymentEntity);
+
+                // Actualiza el estado de la reunión
+                if (paymentEntity.getStatus().equals(PaymentEntity.PaymentStatus.APPROVED)) {
+                    meetingService.respondToMeeting(meeting.getId(), true);
+                }
+
             }
         } catch (MPApiException | MPException e) {
             e.printStackTrace();
