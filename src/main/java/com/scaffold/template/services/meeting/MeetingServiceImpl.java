@@ -174,6 +174,7 @@ public class MeetingServiceImpl implements MeetingService {
         return dto;
     }
 
+    @Override
     public List<MeetingEntity> getMeetingHistory(Long userId) {
         List<MeetingEntity> meetings = meetingRepository.findByStudentIdOrMentorId(userId, userId);
         if (meetings.isEmpty()) {

@@ -15,4 +15,6 @@ public interface MeetingRepository extends JpaRepository<MeetingEntity, Long> {
     List<MeetingEntity> findByMentorIdAndDateAndStatusIn(Long mentorId, LocalDate date, List<MeetingEntity.MeetingStatus> statuses);
     List<MeetingEntity> findByStudentIdAndDateAndStatusIn(Long studentId, LocalDate date, List<MeetingEntity.MeetingStatus> statuses);
     List<MeetingEntity> findByStudentIdOrMentorId(Long studentId, Long mentorId);
+    List<MeetingEntity> findByDate(LocalDate date);
+    List<MeetingEntity> findByDateAndStatus(LocalDate date, MeetingEntity.MeetingStatus status);
 }

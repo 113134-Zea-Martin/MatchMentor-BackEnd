@@ -11,6 +11,7 @@ import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.mercadopago.resources.preference.Preference;
 import com.scaffold.template.dtos.MercadoPagoNotificationDTO;
+import com.scaffold.template.dtos.payment.PaymentHistoryResponseDTO;
 import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.entities.PaymentEntity;
 import com.scaffold.template.entities.UserEntity;
@@ -20,7 +21,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -108,6 +111,8 @@ public class PaymentServiceImpl implements PaymentService {
                 paymentEntity.setTransactionId(paymentId);
                 paymentEntity.setPaymentMethod(payment.getPaymentTypeId());
                 paymentEntity.setAmount(payment.getTransactionAmount());
+                paymentEntity.setMercadoPagoFee(payment.getFeeDetails().get(0).getAmount());
+                paymentEntity.setPlatformFee(payment.getFeeDetails().get(1).getAmount());
                 paymentEntity.setStatus(PaymentEntity.PaymentStatus.valueOf(payment.getStatus().toUpperCase()));
                 paymentEntity.setDate(payment.getDateCreated().toLocalDateTime().plusHours(1));
 
@@ -123,4 +128,52 @@ public class PaymentServiceImpl implements PaymentService {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public List<PaymentHistoryResponseDTO> getPaymentHistory(Long userId) {
+        // Buscar las reuniones del usuario
+        List<MeetingEntity> meetings = meetingService.getMeetingHistory(userId);
+        List<Long> meetingIds = new ArrayList<>();
+        for (MeetingEntity meeting : meetings) {
+            meetingIds.add(meeting.getId());
+        }
+        List<PaymentHistoryResponseDTO> paymentHistoryResponseDTOList = new ArrayList<>();
+        for (Long meetingId : meetingIds) {
+            List<PaymentEntity> payments = paymentRepository.findAllByMeetingId(meetingId);
+            for (PaymentEntity payment : payments) {
+                PaymentHistoryResponseDTO response = mapToPaymentHistoryResponseDTO(payment, userId);
+                paymentHistoryResponseDTOList.add(response);
+            }
+        }
+        return paymentHistoryResponseDTOList;
+    }
+
+    public PaymentHistoryResponseDTO mapToPaymentHistoryResponseDTO(PaymentEntity payment, Long userId) {
+        PaymentHistoryResponseDTO response = new PaymentHistoryResponseDTO();
+        response.setId(payment.getId());
+        response.setDateTime(payment.getDate());
+        response.setPaymentStatus(payment.getStatus());
+
+        if (payment.getMeeting().getMentor() == null) {
+            response.setTransactionType("Cobro");
+            response.setCounterpartName(payment.getMeeting().getStudent().getFirstName() + " " + payment.getMeeting().getStudent().getLastName());
+            response.setMercadoPagoFee(payment.getMercadoPagoFee());
+            response.setPlatformFee(payment.getPlatformFee());
+        } else {
+            response.setTransactionType("Pago");
+            response.setCounterpartName(payment.getMeeting().getMentor().getFirstName() + " " + payment.getMeeting().getMentor().getLastName());
+            response.setMercadoPagoFee(BigDecimal.valueOf(0));
+            response.setPlatformFee(BigDecimal.valueOf(0));
+        }
+
+        BigDecimal totalAmount = payment.getAmount().subtract(response.getMercadoPagoFee()).subtract(response.getPlatformFee());
+        response.setAmount(totalAmount);
+
+        response.setDescription(payment.getMeeting().getReason());
+        response.setPaymentMethod(Objects.equals(payment.getPaymentMethod(), "account_money") ? "Dinero en cuenta" : "Tarjeta de crédito");
+        response.setTransactionId(payment.getTransactionId());
+
+        return response;
+    }
+
 }

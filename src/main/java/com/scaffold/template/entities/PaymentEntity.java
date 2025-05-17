@@ -38,6 +38,12 @@ public class PaymentEntity {
     @Column(name = "amount", nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 
+    @Column(name = "mercado_pago_fee", nullable = false, precision = 10, scale = 2)
+    private BigDecimal mercadoPagoFee;
+
+    @Column(name = "platform_fee", nullable = false, precision = 10, scale = 2)
+    private BigDecimal platformFee;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private PaymentStatus status;

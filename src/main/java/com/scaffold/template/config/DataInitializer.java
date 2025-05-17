@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,7 +25,10 @@ public class DataInitializer {
             InterestRepository interestRepository,
             MatchRepository matchRepository,
             NotificationRepository notificationRepository,
-            UserViewedProfileRepository userViewedProfileRepository, MeetingRepository meetingRepository) {
+            UserViewedProfileRepository userViewedProfileRepository,
+            MeetingRepository meetingRepository,
+            PaymentRepository paymentRepository
+    ) {
         return args -> {
             // Verificar si ya existen usuarios para evitar duplicados
             if (userRepository.count() == 0) {
@@ -57,10 +61,18 @@ public class DataInitializer {
                 InterestEntity interest9 = new InterestEntity();
                 interest9.setName("Big Data");
                 interest9.setDescription("Interés en el análisis y procesamiento de grandes volúmenes de datos.");
+                InterestEntity interest10 = new InterestEntity();
+                interest10.setName("Cloud Computing");
+                interest10.setDescription("Interés en servicios y arquitecturas en la nube.");
+                InterestEntity interest11 = new InterestEntity();
+                interest11.setName("Testing Automatizado");
+                interest11.setDescription("Interés en pruebas automáticas y calidad de software.");
 
                 // Guardar intereses en la base de datos
-                List<InterestEntity> interests = Arrays.asList(interest1, interest2, interest3, interest4, interest5,
-                        interest6, interest7, interest8, interest9);
+                List<InterestEntity> interests = Arrays.asList(
+                        interest1, interest2, interest3, interest4, interest5,
+                        interest6, interest7, interest8, interest9, interest10, interest11
+                );
                 interestRepository.saveAll(interests);
 
                 // Crear usuario administrador
@@ -350,7 +362,6 @@ public class DataInitializer {
                 userRepository.save(userInactivo);
 
                 // ------------------ AGREGAR DATOS PARA PERFILES VISTOS ------------------
-                // Estudiante 1 ve perfil de tutor 1 (le interesa)
                 UserViewedProfileEntity view1 = new UserViewedProfileEntity();
                 view1.setViewer(student1);
                 view1.setViewedUser(tutor1);
@@ -358,7 +369,6 @@ public class DataInitializer {
                 view1.setViewedAt(LocalDateTime.now().minusDays(5));
                 userViewedProfileRepository.save(view1);
 
-                // Estudiante 1 ve perfil de tutor 2 (no le interesa)
                 UserViewedProfileEntity view2 = new UserViewedProfileEntity();
                 view2.setViewer(student1);
                 view2.setViewedUser(tutor2);
@@ -366,7 +376,6 @@ public class DataInitializer {
                 view2.setViewedAt(LocalDateTime.now().minusDays(4));
                 userViewedProfileRepository.save(view2);
 
-                // Estudiante 2 ve perfil de tutor 2 (le interesa)
                 UserViewedProfileEntity view3 = new UserViewedProfileEntity();
                 view3.setViewer(student2);
                 view3.setViewedUser(tutor2);
@@ -374,7 +383,6 @@ public class DataInitializer {
                 view3.setViewedAt(LocalDateTime.now().minusDays(3));
                 userViewedProfileRepository.save(view3);
 
-                // Estudiante 3 ve perfil de tutor 3 (le interesa)
                 UserViewedProfileEntity view4 = new UserViewedProfileEntity();
                 view4.setViewer(student3);
                 view4.setViewedUser(tutor3);
@@ -383,7 +391,6 @@ public class DataInitializer {
                 userViewedProfileRepository.save(view4);
 
                 // ------------------ AGREGAR DATOS PARA MATCHES ------------------
-                // Match entre estudiante 1 y tutor 1 (pendiente)
                 MatchEntity match1 = new MatchEntity();
                 match1.setStudent(student1);
                 match1.setTutor(tutor1);
@@ -391,7 +398,6 @@ public class DataInitializer {
                 match1.setCreatedAt(LocalDateTime.now().minusDays(5));
                 matchRepository.save(match1);
 
-                // Match entre estudiante 2 y tutor 2 (aceptado)
                 MatchEntity match2 = new MatchEntity();
                 match2.setStudent(student2);
                 match2.setTutor(tutor2);
@@ -400,7 +406,6 @@ public class DataInitializer {
                 match2.setUpdatedAt(LocalDateTime.now().minusDays(2));
                 matchRepository.save(match2);
 
-                // Match entre estudiante 3 y tutor 3 (pendiente)
                 MatchEntity match3 = new MatchEntity();
                 match3.setStudent(student3);
                 match3.setTutor(tutor3);
@@ -408,7 +413,6 @@ public class DataInitializer {
                 match3.setCreatedAt(LocalDateTime.now().minusDays(1));
                 matchRepository.save(match3);
 
-                // Match entre estudiante 1 y tutor 3 (rechazado)
                 MatchEntity match4 = new MatchEntity();
                 match4.setStudent(student1);
                 match4.setTutor(tutor3);
@@ -418,7 +422,6 @@ public class DataInitializer {
                 matchRepository.save(match4);
 
                 // ------------------ AGREGAR DATOS PARA NOTIFICACIONES ------------------
-                // Notificación para tutor 1 (solicitud de conexión)
                 NotificationEntity notification1 = new NotificationEntity();
                 notification1.setUserId(tutor1.getId());
                 notification1.setMessage("Martín González te ha enviado una solicitud de conexión");
@@ -428,7 +431,6 @@ public class DataInitializer {
                 notification1.setCreatedAt(LocalDateTime.now().minusDays(5));
                 notificationRepository.save(notification1);
 
-                // Notificación para tutor 3 (solicitud de conexión)
                 NotificationEntity notification2 = new NotificationEntity();
                 notification2.setUserId(tutor3.getId());
                 notification2.setMessage("Pedro López te ha enviado una solicitud de conexión");
@@ -438,7 +440,6 @@ public class DataInitializer {
                 notification2.setCreatedAt(LocalDateTime.now().minusDays(1));
                 notificationRepository.save(notification2);
 
-                // Notificación para estudiante 2 (conexión aceptada)
                 NotificationEntity notification3 = new NotificationEntity();
                 notification3.setUserId(student2.getId());
                 notification3.setMessage("Laura Gómez ha aceptado tu solicitud de conexión");
@@ -446,10 +447,8 @@ public class DataInitializer {
                 notification3.setRelatedEntityId(match2.getId());
                 notification3.setIsRead(true);
                 notification3.setCreatedAt(LocalDateTime.now().minusDays(2));
-//                notification3.setReadAt(LocalDateTime.now().minusDays(2).plusHours(2));
                 notificationRepository.save(notification3);
 
-                // Notificación para estudiante 1 (conexión rechazada)
                 NotificationEntity notification4 = new NotificationEntity();
                 notification4.setUserId(student1.getId());
                 notification4.setMessage("Javier Mendoza ha rechazado tu solicitud de conexión");
@@ -457,10 +456,9 @@ public class DataInitializer {
                 notification4.setRelatedEntityId(match4.getId());
                 notification4.setIsRead(true);
                 notification4.setCreatedAt(LocalDateTime.now().minusDays(6));
-//                notification4.setReadAt(LocalDateTime.now().minusDays(6).plusHours(1));
                 notificationRepository.save(notification4);
 
-                // Meeting entre estudiante 1 y tutor 6
+                // Meeting entre estudiante 1 y tutor 3
                 MeetingEntity meeting = new MeetingEntity();
                 meeting.setDate(LocalDate.now());
                 meeting.setDuration(1);
@@ -471,8 +469,263 @@ public class DataInitializer {
                 meeting.setMentor(tutor3);
                 meeting.setStudent(student1);
                 meeting.setReason("Consulta sobre desarrollo de software");
-                meeting.setStatus(MeetingEntity.MeetingStatus.PROPOSED);
+                meeting.setStatus(MeetingEntity.MeetingStatus.ACCEPTED);
                 meetingRepository.save(meeting);
+
+                // ------------------ DATOS ADICIONALES ------------------
+
+                // Estudiante 4
+                UserEntity student4 = new UserEntity();
+                student4.setFirstName("Lucía");
+                student4.setLastName("Fernández");
+                student4.setEmail("lucia.fernandez@example.com");
+                student4.setPassword(passwordEncoder.encode("password123"));
+                student4.setBirthDate(LocalDate.of(1998, 2, 10));
+                student4.setLocation("Salta");
+                student4.setEducationLevel("Universitario");
+                student4.setStudyArea("Informática");
+                student4.setInstitution("Universidad Nacional de Salta");
+                student4.setGraduationYear("2025");
+                student4.setMentoringGoals("Aprender sobre cloud y testing automatizado");
+                student4.setLinkedinUrl("https://linkedin.com/in/lucia-fernandez");
+                student4.setBio("Interesada en nuevas tecnologías y automatización");
+                student4.setRole(Role.STUDENT);
+                student4.setIsActive(true);
+                student4.setCreatedAt(LocalDateTime.now());
+                List<UserInterestEntity> student4Interests = new ArrayList<>();
+                UserInterestEntity s4Interest1 = new UserInterestEntity();
+                s4Interest1.setUser(student4);
+                s4Interest1.setInterest(interest10); // Cloud
+                student4Interests.add(s4Interest1);
+                UserInterestEntity s4Interest2 = new UserInterestEntity();
+                s4Interest2.setUser(student4);
+                s4Interest2.setInterest(interest11); // Testing
+                student4Interests.add(s4Interest2);
+                student4.setUserInterests(student4Interests);
+                userRepository.save(student4);
+
+                // Estudiante 5
+                UserEntity student5 = new UserEntity();
+                student5.setFirstName("Sofía");
+                student5.setLastName("Martínez");
+                student5.setEmail("sofia.martinez@example.com");
+                student5.setPassword(passwordEncoder.encode("password123"));
+                student5.setBirthDate(LocalDate.of(1999, 11, 5));
+                student5.setLocation("Santa Fe");
+                student5.setEducationLevel("Universitario");
+                student5.setStudyArea("Sistemas de Información");
+                student5.setInstitution("UTN Santa Fe");
+                student5.setGraduationYear("2024");
+                student5.setMentoringGoals("Mejorar habilidades en DevOps y microservicios");
+                student5.setLinkedinUrl("https://linkedin.com/in/sofia-martinez");
+                student5.setBio("Apasionada por la automatización y la integración continua");
+                student5.setRole(Role.STUDENT);
+                student5.setIsActive(true);
+                student5.setCreatedAt(LocalDateTime.now());
+                List<UserInterestEntity> student5Interests = new ArrayList<>();
+                UserInterestEntity s5Interest1 = new UserInterestEntity();
+                s5Interest1.setUser(student5);
+                s5Interest1.setInterest(interest8); // DevOps
+                student5Interests.add(s5Interest1);
+                UserInterestEntity s5Interest2 = new UserInterestEntity();
+                s5Interest2.setUser(student5);
+                s5Interest2.setInterest(interest6); // Microservicios
+                student5Interests.add(s5Interest2);
+                student5.setUserInterests(student5Interests);
+                userRepository.save(student5);
+
+                // Tutor 4
+                UserEntity tutor4 = new UserEntity();
+                tutor4.setFirstName("Marina");
+                tutor4.setLastName("Suárez");
+                tutor4.setEmail("marina.suarez@example.com");
+                tutor4.setPassword(passwordEncoder.encode("password123"));
+                tutor4.setBirthDate(LocalDate.of(1987, 6, 30));
+                tutor4.setLocation("Tucumán");
+                tutor4.setCurrentProfession("QA Automation Lead");
+                tutor4.setCompany("QualitySoft");
+                tutor4.setYearsOfExperience(9);
+                tutor4.setProfessionalBio("Especialista en testing automatizado y calidad de software");
+                tutor4.setHourlyRate(38.0);
+                tutor4.setLinkedinUrl("https://linkedin.com/in/marina-suarez");
+                tutor4.setBio("Me gusta ayudar a equipos a mejorar la calidad de sus productos");
+                tutor4.setRole(Role.TUTOR);
+                tutor4.setIsActive(true);
+                tutor4.setIsVisible(true);
+                tutor4.setCreatedAt(LocalDateTime.now());
+                List<UserInterestEntity> tutor4Interests = new ArrayList<>();
+                UserInterestEntity t4Interest1 = new UserInterestEntity();
+                t4Interest1.setUser(tutor4);
+                t4Interest1.setInterest(interest11); // Testing
+                tutor4Interests.add(t4Interest1);
+                UserInterestEntity t4Interest2 = new UserInterestEntity();
+                t4Interest2.setUser(tutor4);
+                t4Interest2.setInterest(interest7); // Gestión de Proyectos
+                tutor4Interests.add(t4Interest2);
+                tutor4.setUserInterests(tutor4Interests);
+                userRepository.save(tutor4);
+
+                // Tutor 5
+                UserEntity tutor5 = new UserEntity();
+                tutor5.setFirstName("Federico");
+                tutor5.setLastName("Paz");
+                tutor5.setEmail("federico.paz@example.com");
+                tutor5.setPassword(passwordEncoder.encode("password123"));
+                tutor5.setBirthDate(LocalDate.of(1990, 9, 18));
+                tutor5.setLocation("Neuquén");
+                tutor5.setCurrentProfession("Cloud Architect");
+                tutor5.setCompany("Cloudify");
+                tutor5.setYearsOfExperience(12);
+                tutor5.setProfessionalBio("Arquitecto de soluciones cloud y microservicios");
+                tutor5.setHourlyRate(55.0);
+                tutor5.setLinkedinUrl("https://linkedin.com/in/federico-paz");
+                tutor5.setBio("Disfruto diseñar infraestructuras escalables y seguras");
+                tutor5.setRole(Role.TUTOR);
+                tutor5.setIsActive(true);
+                tutor5.setIsVisible(true);
+                tutor5.setCreatedAt(LocalDateTime.now());
+                List<UserInterestEntity> tutor5Interests = new ArrayList<>();
+                UserInterestEntity t5Interest1 = new UserInterestEntity();
+                t5Interest1.setUser(tutor5);
+                t5Interest1.setInterest(interest10); // Cloud
+                tutor5Interests.add(t5Interest1);
+                UserInterestEntity t5Interest2 = new UserInterestEntity();
+                t5Interest2.setUser(tutor5);
+                t5Interest2.setInterest(interest6); // Microservicios
+                tutor5Interests.add(t5Interest2);
+                tutor5.setUserInterests(tutor5Interests);
+                userRepository.save(tutor5);
+
+                // Vistas de perfil adicionales
+                UserViewedProfileEntity view5 = new UserViewedProfileEntity();
+                view5.setViewer(student4);
+                view5.setViewedUser(tutor4);
+                view5.setStatus(Status.ACCEPTED);
+                view5.setViewedAt(LocalDateTime.now().minusDays(2));
+                userViewedProfileRepository.save(view5);
+
+                UserViewedProfileEntity view6 = new UserViewedProfileEntity();
+                view6.setViewer(student5);
+                view6.setViewedUser(tutor5);
+                view6.setStatus(Status.PENDING);
+                view6.setViewedAt(LocalDateTime.now().minusDays(1));
+                userViewedProfileRepository.save(view6);
+
+                UserViewedProfileEntity view7 = new UserViewedProfileEntity();
+                view7.setViewer(tutor4);
+                view7.setViewedUser(student4);
+                view7.setStatus(Status.ACCEPTED);
+                view7.setViewedAt(LocalDateTime.now().minusDays(1));
+                userViewedProfileRepository.save(view7);
+
+                // Matches adicionales
+                MatchEntity match5 = new MatchEntity();
+                match5.setStudent(student4);
+                match5.setTutor(tutor4);
+                match5.setStatus(Status.ACCEPTED);
+                match5.setCreatedAt(LocalDateTime.now().minusDays(2));
+                matchRepository.save(match5);
+
+                MatchEntity match6 = new MatchEntity();
+                match6.setStudent(student5);
+                match6.setTutor(tutor5);
+                match6.setStatus(Status.PENDING);
+                match6.setCreatedAt(LocalDateTime.now().minusDays(1));
+                matchRepository.save(match6);
+
+                MatchEntity match7 = new MatchEntity();
+                match7.setStudent(student5);
+                match7.setTutor(tutor4);
+                match7.setStatus(Status.REJECTED);
+                match7.setCreatedAt(LocalDateTime.now().minusDays(3));
+                matchRepository.save(match7);
+
+                // Notificaciones adicionales
+                NotificationEntity notification5 = new NotificationEntity();
+                notification5.setUserId(tutor4.getId());
+                notification5.setMessage("Lucía Fernández te ha enviado una solicitud de conexión");
+                notification5.setNotificationType(NotificationType.NEW_CONNECTION_REQUEST);
+                notification5.setRelatedEntityId(match5.getId());
+                notification5.setIsRead(false);
+                notification5.setCreatedAt(LocalDateTime.now().minusDays(2));
+                notificationRepository.save(notification5);
+
+                NotificationEntity notification6 = new NotificationEntity();
+                notification6.setUserId(student4.getId());
+                notification6.setMessage("Marina Suárez ha aceptado tu solicitud de conexión");
+                notification6.setNotificationType(NotificationType.CONNECTION_ACCEPTED);
+                notification6.setRelatedEntityId(match5.getId());
+                notification6.setIsRead(true);
+                notification6.setCreatedAt(LocalDateTime.now().minusDays(1));
+                notificationRepository.save(notification6);
+
+                NotificationEntity notification7 = new NotificationEntity();
+                notification7.setUserId(student5.getId());
+                notification7.setMessage("Federico Paz ha recibido tu solicitud de conexión");
+                notification7.setNotificationType(NotificationType.NEW_CONNECTION_REQUEST);
+                notification7.setRelatedEntityId(match6.getId());
+                notification7.setIsRead(false);
+                notification7.setCreatedAt(LocalDateTime.now().minusDays(1));
+                notificationRepository.save(notification7);
+
+                NotificationEntity notification8 = new NotificationEntity();
+                notification8.setUserId(student5.getId());
+                notification8.setMessage("Marina Suárez ha rechazado tu solicitud de conexión");
+                notification8.setNotificationType(NotificationType.CONNECTION_REJECTED);
+                notification8.setRelatedEntityId(match7.getId());
+                notification8.setIsRead(true);
+                notification8.setCreatedAt(LocalDateTime.now().minusDays(2));
+                notificationRepository.save(notification8);
+
+                // Meetings adicionales
+                MeetingEntity meeting2 = new MeetingEntity();
+                meeting2.setDate(LocalDate.now().plusDays(1));
+                meeting2.setDuration(2);
+                meeting2.setHourlyRate(38.0);
+                meeting2.setTime(LocalTime.of(15, 0));
+                meeting2.setCreatedAt(LocalDateTime.now());
+                meeting2.setMatch(match5);
+                meeting2.setMentor(tutor4);
+                meeting2.setStudent(student4);
+                meeting2.setReason("Revisión de pruebas automatizadas");
+                meeting2.setStatus(MeetingEntity.MeetingStatus.ACCEPTED);
+                meetingRepository.save(meeting2);
+
+                MeetingEntity meeting3 = new MeetingEntity();
+                meeting3.setDate(LocalDate.now().plusDays(3));
+                meeting3.setDuration(1);
+                meeting3.setHourlyRate(55.0);
+                meeting3.setTime(LocalTime.of(11, 0));
+                meeting3.setCreatedAt(LocalDateTime.now());
+                meeting3.setMatch(match6);
+                meeting3.setMentor(tutor5);
+                meeting3.setStudent(student5);
+                meeting3.setReason("Consultoría sobre arquitectura cloud");
+                meeting3.setStatus(MeetingEntity.MeetingStatus.PROPOSED);
+                meetingRepository.save(meeting3);
+
+                // ------------------ PAGOS ------------------
+                PaymentEntity payment1 = new PaymentEntity();
+                payment1.setMeeting(meeting2);
+                payment1.setAmount(BigDecimal.valueOf(meeting2.getHourlyRate() * meeting2.getDuration()));
+                payment1.setStatus(PaymentEntity.PaymentStatus.APPROVED);
+                payment1.setDate(LocalDateTime.now());
+                payment1.setPaymentMethod("MercadoPago");
+                payment1.setTransactionId("MP-TRX-001");
+                payment1.setMercadoPagoFee(payment1.getAmount().multiply(new BigDecimal("0.10"))); // 10% de comisión
+                payment1.setPlatformFee(BigDecimal.valueOf(5.0));
+                paymentRepository.save(payment1);
+
+                PaymentEntity payment2 = new PaymentEntity();
+                payment2.setMeeting(meeting);
+                payment2.setAmount(BigDecimal.valueOf(meeting.getHourlyRate() * meeting.getDuration()));
+                payment2.setStatus(PaymentEntity.PaymentStatus.PENDING);
+                payment2.setDate(LocalDateTime.now().minusDays(1));
+                payment2.setPaymentMethod("MercadoPago");
+                payment2.setTransactionId("MP-TRX-002");
+                payment2.setMercadoPagoFee(payment2.getAmount().multiply(new BigDecimal("0.10"))); // 10% de comisión
+                payment2.setPlatformFee(BigDecimal.valueOf(5.0));
+                paymentRepository.save(payment2);
 
                 System.out.println("Datos iniciales cargados correctamente en todas las tablas");
             }

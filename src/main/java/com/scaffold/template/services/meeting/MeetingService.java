@@ -13,6 +13,9 @@ import java.util.List;
 public interface MeetingService {
 
     CreateMeetingRequestDTO createMeeting(Long studentId, Long mentorId, Long matchId, LocalDate date, LocalTime time, int duration, String reason);
+
+    List<MeetingEntity> getMeetingHistory(Long userId);
+
     List<MeetingHistoryResponseDTO> getMeetingHistoryResponseDTO(Long userId);
 
     void respondToMeeting(Long meetingId, boolean status);
