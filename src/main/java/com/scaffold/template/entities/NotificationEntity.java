@@ -1,5 +1,6 @@
 package com.scaffold.template.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,9 +25,13 @@ public class NotificationEntity {
 
     private String message; // Mensaje de la notificación
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt; // Fecha y hora de creación de la notificación
 
     private Boolean isRead; // Indica si la notificación ha sido leída o no
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING , pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime readedAt; // Fecha y hora de lectura de la notificación
 
     private Long relatedEntityId; // ID de la entidad relacionada (ej. ID del match o perfil visto
 }

@@ -4,18 +4,22 @@ import com.scaffold.template.entities.NotificationEntity;
 import com.scaffold.template.entities.NotificationType;
 import com.scaffold.template.repositories.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
+//    private final SimpMessagingTemplate messagingTemplate;
 
     @Autowired
     public NotificationServiceImpl(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
+//        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -28,6 +32,9 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setRelatedEntityId(matchId);
         notificationRepository.save(notification);
+
+        // Enviar la notificación al cliente a través de WebSocket
+//        messagingTemplate.convertAndSend("/topic/notifications/" + tutorId, notification);
     }
 
     @Override
@@ -40,6 +47,8 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setRelatedEntityId(matchId);
         notificationRepository.save(notification);
+        // Enviar la notificación al cliente a través de WebSocket
+//        messagingTemplate.convertAndSend("/topic/notifications/" + studentId, notification);
     }
 
     @Override
@@ -52,6 +61,8 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setRelatedEntityId(meetingId);
         notificationRepository.save(notification);
+        // Enviar la notificación al cliente a través de WebSocket
+//        messagingTemplate.convertAndSend("/topic/notifications/" + studentId, notification);
     }
 
     @Override
@@ -64,5 +75,35 @@ public class NotificationServiceImpl implements NotificationService {
         notification.setIsRead(false);
         notification.setRelatedEntityId(meetingId);
         notificationRepository.save(notification);
+        // Enviar la notificación al cliente a través de WebSocket
+//        messagingTemplate.convertAndSend("/topic/notifications/" + mentorId, notification);
     }
+
+    @Override
+    public List<NotificationEntity> getNotificationsByUserId(Long userId) {
+        return notificationRepository.findByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+//    @Override
+//    public boolean hasUnreadNotifications(Long userId) {
+//        return notificationRepository.existsByUserIdAndIsReadFalse(userId);
+//    }
+
+    @Override
+    public List<NotificationEntity> getTop10UnreadNotificationsByUserId(Long userId) {
+        return notificationRepository.findTop10ByUserIdOrderByCreatedAtDesc(userId);
+    }
+
+
+    @Override
+    public void markNotificationAsRead(Long notificationId) {
+        NotificationEntity notification = notificationRepository.findById(notificationId).orElse(null);
+        if (notification != null) {
+            notification.setIsRead(true);
+            notification.setReadedAt(LocalDateTime.now());
+            notificationRepository.save(notification);
+        }
+    }
+
+
 }
