@@ -94,6 +94,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public UserEntity registerUser(UserRegisterRequestDTO userRegisterRequestDTO) {
 
+        if (userRegisterRequestDTO.getPassword() == null || userRegisterRequestDTO.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña no puede estar vacía.");
+        }
+
+
         // Verificar si el correo electrónico ya está registrado
         if (userRepository.existsByEmail(userRegisterRequestDTO.getEmail())) {
             throw new IllegalArgumentException("El correo electrónico ya está registrado.");
@@ -127,13 +132,13 @@ public class AuthServiceImpl implements AuthService {
         // Verificar si el usuario existe
         UserEntity userEntity = userRepository.findByEmail(email);
 
+        if (userEntity == null) {
+            throw new IllegalArgumentException("Usuario no encontrado.");
+        }
+
         //Verificar estado de cuenta activo
         if (!userEntity.getIsActive()) {
             throw new IllegalArgumentException("Cuenta inactiva.");
-        }
-
-        if (userEntity == null) {
-            throw new IllegalArgumentException("Usuario no encontrado.");
         }
 
         // Verificar la contraseña

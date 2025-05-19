@@ -41,7 +41,10 @@ public class RecordatorioMeetingService {
     }
 
 
-    private void sendMail(String destinatario, MeetingEntity meeting, String nombre) {
+    public void sendMail(String destinatario, MeetingEntity meeting, String nombre) {    // Validar que el email no sea nulo y que la reunión tenga un motivo
+        if (destinatario == null || meeting == null || meeting.getReason() == null) {
+            return; // No enviar correo si falta información crítica
+        }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(destinatario);
         message.setSubject("Recordatorio de reunión programada");
