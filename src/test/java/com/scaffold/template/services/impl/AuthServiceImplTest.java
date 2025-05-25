@@ -5,9 +5,11 @@ import com.scaffold.template.dtos.auth.login.LoginRequestDTO;
 import com.scaffold.template.dtos.auth.login.LoginResponseDTO;
 import com.scaffold.template.dtos.profile.UserResponseDTO;
 import com.scaffold.template.entities.Role;
+import com.scaffold.template.entities.UserActivityEntity;
 import com.scaffold.template.entities.UserEntity;
 import com.scaffold.template.repositories.UserRepository;
 import com.scaffold.template.security.JwtConfig;
+import com.scaffold.template.services.userActivity.UserActivityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -19,7 +21,10 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,7 +35,7 @@ class AuthServiceImplTest {
         UserRepository mockUserRepository = mock(UserRepository.class);
         when(mockUserRepository.findAll()).thenReturn(new ArrayList<>());
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null, null);
 
         List<UserResponseDTO> result = authService.getAllUsers();
 
@@ -42,7 +47,7 @@ class AuthServiceImplTest {
         UserRepository mockUserRepository = mock(UserRepository.class);
         when(mockUserRepository.existsByEmail("existing@example.com")).thenReturn(true);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null, null);
 
         UserRegisterRequestDTO request = new UserRegisterRequestDTO();
         request.setEmail("existing@example.com");
@@ -55,7 +60,7 @@ class AuthServiceImplTest {
         UserRepository mockUserRepository = mock(UserRepository.class);
         when(mockUserRepository.findByEmail("nonexistent@example.com")).thenReturn(null);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () -> authService.authenticateUser("nonexistent@example.com", "password"));
     }
@@ -65,7 +70,7 @@ class AuthServiceImplTest {
         AuthenticationManager mockAuthManager = mock(AuthenticationManager.class);
         when(mockAuthManager.authenticate(any())).thenThrow(new RuntimeException("Authentication failed"));
 
-        AuthServiceImpl authService = new AuthServiceImpl(null, null, mockAuthManager, null);
+        AuthServiceImpl authService = new AuthServiceImpl(null, null, mockAuthManager, null, null);
 
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail("user@example.com");
@@ -79,7 +84,7 @@ class AuthServiceImplTest {
         UserRepository mockUserRepository = mock(UserRepository.class);
         when(mockUserRepository.findByEmail("nonexistent@example.com")).thenReturn(null);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () -> authService.getUserByEmail("nonexistent@example.com"));
     }
@@ -97,7 +102,7 @@ class AuthServiceImplTest {
         when(mockUserRepository.findByEmail("user@example.com")).thenReturn(userEntity);
         when(mockPasswordEncoder.matches("wrongPassword", "encodedPassword")).thenReturn(false);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null, null);
 
         assertThrows(IllegalArgumentException.class, () -> authService.authenticateUser("user@example.com", "wrongPassword"));
     }
@@ -115,7 +120,7 @@ class AuthServiceImplTest {
         when(mockUserRepository.findByEmail("user@example.com")).thenReturn(userEntity);
         when(mockPasswordEncoder.matches("correctPassword", "encodedPassword")).thenReturn(true);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null, null);
 
         UserEntity result = authService.authenticateUser("user@example.com", "correctPassword");
 
@@ -126,8 +131,12 @@ class AuthServiceImplTest {
     @Test
     void loginReturnsTokenWhenAuthenticationSucceeds() {
         UserRepository mockUserRepository = mock(UserRepository.class);
+        UserActivityService mockUserActivityService = mock(UserActivityService.class);
         AuthenticationManager mockAuthManager = mock(AuthenticationManager.class);
         JwtConfig mockJwtConfig = mock(JwtConfig.class);
+
+//        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, mockAuthManager, mockJwtConfig, mockUserActivityService);
+
 
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
@@ -144,8 +153,9 @@ class AuthServiceImplTest {
         when(mockAuthentication.getPrincipal()).thenReturn(mockUserDetails);
         when(mockUserRepository.findByEmail("user@example.com")).thenReturn(userEntity);
         when(mockJwtConfig.generateToken(anyMap(), any())).thenReturn("mockToken");
+        doNothing().when(mockUserActivityService).createUserActivity(anyLong(), anyString());
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, mockAuthManager, mockJwtConfig);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, mockAuthManager, mockJwtConfig, mockUserActivityService);
 
         LoginRequestDTO loginRequest = new LoginRequestDTO();
         loginRequest.setEmail("user@example.com");
@@ -167,7 +177,7 @@ class AuthServiceImplTest {
         when(mockPasswordEncoder.encode("password")).thenReturn("encodedPassword");
         when(mockUserRepository.save(any(UserEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, mockPasswordEncoder, null, null, null);
 
         UserRegisterRequestDTO request = new UserRegisterRequestDTO();
         request.setFirstName("John");
@@ -192,7 +202,7 @@ class AuthServiceImplTest {
 
         when(mockUserRepository.existsByEmail("newuser@example.com")).thenReturn(false);
 
-        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null);
+        AuthServiceImpl authService = new AuthServiceImpl(mockUserRepository, null, null, null, null);
 
         UserRegisterRequestDTO request = new UserRegisterRequestDTO();
         request.setFirstName("John");

@@ -28,4 +28,6 @@ public interface NotificationService {
     List<NotificationEntity> getTop10UnreadNotificationsByUserId(Long userId);
 
     void markNotificationAsRead(Long notificationId); // Marca una notificación como leída
+
+    boolean hasUnreadNotifications(Long userId); // Devuelve true si el usuario tiene notificaciones no leídas
 }

@@ -34,13 +34,6 @@ public class MatchController {
         this.matchService = matchService;
     }
 
-//    @GetMapping("/{userId}/compatible-tutors")
-//    public ResponseEntity<List<UserEntity>> findCompatibleTutors(@RequestParam Long userId) {
-//
-//        List<UserEntity> compatibleTutors = matchService.findCompatibleTutors(userId);
-//        return ResponseEntity.ok(compatibleTutors);
-//    }
-
     @GetMapping("/{userId}/tutors-with-common-interests")
     public ResponseEntity<List<Long>> getIDsOfTutorsWithCommonInterests(@PathVariable Long userId) {
         List<Long> tutorIds = matchService.getIDsOfTutorsWithCommonInterests(userId);

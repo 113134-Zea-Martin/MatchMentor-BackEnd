@@ -72,4 +72,13 @@ public class NotificationController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @GetMapping("/{userId}/unread")
+    public Boolean hasUnreadNotifications(@PathVariable("userId") String userId) {
+        try {
+            return notificationService.hasUnreadNotifications(Long.parseLong(userId));
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

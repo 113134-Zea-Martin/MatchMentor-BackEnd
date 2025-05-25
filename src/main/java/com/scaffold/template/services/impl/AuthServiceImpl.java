@@ -10,6 +10,7 @@ import com.scaffold.template.entities.UserInterestEntity;
 import com.scaffold.template.repositories.UserRepository;
 import com.scaffold.template.security.JwtConfig;
 import com.scaffold.template.services.AuthService;
+import com.scaffold.template.services.userActivity.UserActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,6 +46,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtConfig jwtConfig;
 
+    private final UserActivityService userActivityService;
+
     /**
      * Constructor que inyecta el repositorio de usuarios y el codificador de contraseñas.
      *
@@ -53,11 +56,12 @@ public class AuthServiceImpl implements AuthService {
      */
     @Autowired
     public AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                           AuthenticationManager authenticationManager, JwtConfig jwtConfig) {
+                           AuthenticationManager authenticationManager, JwtConfig jwtConfig, UserActivityService userActivityService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtConfig = jwtConfig;
+        this.userActivityService = userActivityService;
     }
 
     /**
@@ -182,6 +186,8 @@ public class AuthServiceImpl implements AuthService {
         String token = jwtConfig.generateToken(claims, userDetails);
 
         loginResponseDTO.setToken(token);
+
+        userActivityService.createUserActivity(user.getId(), "LOGIN");
 
         return loginResponseDTO;
     }

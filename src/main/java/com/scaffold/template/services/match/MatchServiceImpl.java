@@ -55,6 +55,10 @@ public class MatchServiceImpl implements MatchService {
     public List<Long> getIDsOfTutorsWithCommonInterests(Long userId) {
 //        List<UserEntity> tutors = userRepository.findTutorsWithCommonInterests(userId);
         List<UserEntity> tutors = userService.findTutorsWithCommonInterests(userId);
+
+        // Filtrar los tutores que están activos y visibles
+        tutors.removeIf(tutor -> !tutor.getIsActive() || !tutor.getIsVisible());
+
         return tutors.stream()
                 .map(UserEntity::getId)
                 .toList();
@@ -164,7 +168,15 @@ public class MatchServiceImpl implements MatchService {
 
     @Override
     public List<MatchEntity> getMatchesByStatusAndUserId(Status status, Long userId) {
-        return matchRepository.findByStatusAndUserId(status, userId);
+        List<MatchEntity> matches = matchRepository.findByStatusAndUserId(status, userId);
+        // Filtrar los matches donde el estudiante o tutor no está activo
+        matches.removeIf(match -> {
+            UserEntity student = match.getStudent();
+            UserEntity tutor = match.getTutor();
+            return (student == null || !student.getIsActive()) && (tutor == null || !tutor.getIsActive());
+        });
+
+        return matches;
     }
 
     @Override

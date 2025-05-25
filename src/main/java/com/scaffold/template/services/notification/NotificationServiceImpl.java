@@ -105,5 +105,9 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
+    @Override
+    public boolean hasUnreadNotifications(Long userId) {
+        return notificationRepository.existsByUserIdAndIsReadFalse(userId);
+    }
 
 }

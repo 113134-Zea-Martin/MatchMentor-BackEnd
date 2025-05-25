@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
 
-    @Value("${mercadopago.redirect.url.origin}")
+    @Value("${frontend.url}")
     private String frontEndUrl;
 
     @Value("${backend.url}")

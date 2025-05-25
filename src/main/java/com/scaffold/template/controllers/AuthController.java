@@ -123,12 +123,12 @@ public class AuthController {
         try {
             LoginResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
 
-            if (!loginResponseDTO.isActive()) {
-                response.setSuccess(false);
-                response.setStatusCode(403);
-                response.setMessage("Usuario inactivo");
-                return ResponseEntity.ok(response);
-            }
+//            if (!loginResponseDTO.isActive()) {
+//                response.setSuccess(false);
+//                response.setStatusCode(403);
+//                response.setMessage("Usuario inactivo");
+//                return ResponseEntity.ok(response);
+//            }
 
             response.setSuccess(true);
             response.setStatusCode(200);

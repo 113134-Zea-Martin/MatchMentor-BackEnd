@@ -18,7 +18,7 @@ import java.util.ArrayList;
 @Configuration
 public class DataInitializer {
 
-    @Bean
+//    @Bean
     public CommandLineRunner initData(
             UserRepository userRepository,
             PasswordEncoder passwordEncoder,
