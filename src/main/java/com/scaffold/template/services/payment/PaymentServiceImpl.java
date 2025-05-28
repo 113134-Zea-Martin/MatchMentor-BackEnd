@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -140,11 +141,16 @@ public class PaymentServiceImpl implements PaymentService {
         List<PaymentHistoryResponseDTO> paymentHistoryResponseDTOList = new ArrayList<>();
         for (Long meetingId : meetingIds) {
             List<PaymentEntity> payments = paymentRepository.findAllByMeetingId(meetingId);
+
             for (PaymentEntity payment : payments) {
                 PaymentHistoryResponseDTO response = mapToPaymentHistoryResponseDTO(payment, userId);
                 paymentHistoryResponseDTOList.add(response);
             }
         }
+
+        // Ordenar por fecha de pago descendente
+        paymentHistoryResponseDTOList.sort(Comparator.comparing(PaymentHistoryResponseDTO::getDateTime).reversed());
+
         return paymentHistoryResponseDTOList;
     }
 
