@@ -1,5 +1,6 @@
 package com.scaffold.template.services.adminReport;
 
+import com.scaffold.template.dtos.adminReport.ResponseReportDTO;
 import com.scaffold.template.entities.MatchEntity;
 import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.entities.PaymentEntity;
@@ -14,17 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
-import java.time.temporal.WeekFields;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -291,6 +289,36 @@ public class AdminReportServiceImpl implements AdminReportService {
         }
 
         return topStudents;
+    }
+
+    @Override
+    public Map<String, BigDecimal> getTop3TutorsByMatchesAccepted(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        List<Object[]> results = matchRepository.findTutorsByAcceptedMatches(startDateTime, endDateTime);
+        Map<String, BigDecimal> topTutors = new LinkedHashMap<>();
+        for (Object[] result : results) {
+            String tutorFullName = result[1].toString();
+            Long count = (Long) result[0];
+            topTutors.put(tutorFullName, new BigDecimal(count));
+        }
+        return topTutors;
+    }
+
+    @Override
+    public Map<String, BigDecimal> getTopInterestByMatchAccepted(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime = startDate.atStartOfDay();
+        LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
+
+        List<Object[]> results = matchRepository.findTopInterestByMatchAccepted(startDateTime, endDateTime);
+        Map<String, BigDecimal> topInterests = new LinkedHashMap<>();
+        for (Object[] result : results) {
+            String interestName = result[1].toString();
+            Long count = (Long) result[0];
+            topInterests.put(interestName, new BigDecimal(count));
+        }
+        return topInterests;
     }
 
     @Override

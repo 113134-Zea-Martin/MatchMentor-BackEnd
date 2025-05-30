@@ -71,6 +71,25 @@ public class AdminReportController {
         return ResponseEntity.ok(reportData);
     }
 
+    @GetMapping("/top-tutors")
+    public ResponseEntity<Map<String, BigDecimal>> getTop3TutorsByMatchesAccepted(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        Map<String, BigDecimal> reportData = adminReportService.getTop3TutorsByMatchesAccepted(startDate, endDate);
+        return ResponseEntity.ok(reportData);
+    }
+
+    @GetMapping("/top-interests")
+    public ResponseEntity<Map<String, BigDecimal>> getTop3InterestsByMatchesAccepted(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        Map<String, BigDecimal> reportData = adminReportService.getTopInterestByMatchAccepted(startDate, endDate);
+        return ResponseEntity.ok(reportData);
+    }
+
+
     @GetMapping("/payments-by-status")
     public ResponseEntity<Map<String, BigDecimal>> getPaymentsByStatusAndDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

@@ -29,7 +29,7 @@ public interface PaymentRepository extends JpaRepository<PaymentEntity, Long> {
            "JOIN p.meeting m " +
            "WHERE p.status = 'APPROVED' AND p.date BETWEEN :startDate AND :endDate " +
            "GROUP BY m.student.id " +
-           "ORDER BY fee DESC")
+           "ORDER BY fee DESC limit 3")
     List<Object[]> findTop3StudentsByPaymentFee(LocalDateTime startDate, LocalDateTime endDate);
 
     // Método para obtener la cantidad de pagos aprobados y fechas

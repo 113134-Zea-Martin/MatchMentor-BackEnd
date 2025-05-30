@@ -21,4 +21,8 @@ public interface AdminReportService {
     Map<String, BigDecimal> getTop3StudentsByPaymentFee(LocalDate startDate, LocalDate endDate);
     // Método para obtener el reporte de cantidad de pagos por estado y fechas, y cantidad de pagos totales por estado y fechas
     Map<String, BigDecimal> getPaymentsByStatusAndDate(LocalDate startDate, LocalDate endDate);
+
+    Map<String, BigDecimal> getTop3TutorsByMatchesAccepted(LocalDate startDate, LocalDate endDate);
+
+    Map<String, BigDecimal> getTopInterestByMatchAccepted(LocalDate startDate, LocalDate endDate);
 }
