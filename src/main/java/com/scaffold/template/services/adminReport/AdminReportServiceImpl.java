@@ -1,6 +1,5 @@
 package com.scaffold.template.services.adminReport;
 
-import com.scaffold.template.dtos.adminReport.ResponseReportDTO;
 import com.scaffold.template.entities.MatchEntity;
 import com.scaffold.template.entities.MeetingEntity;
 import com.scaffold.template.entities.PaymentEntity;
@@ -15,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -78,9 +78,15 @@ public class AdminReportServiceImpl implements AdminReportService {
 
         // Calcular el porcentaje de crecimiento
         if (initialUsersCount > 0) {
-            growthPercentage = BigDecimal.valueOf(finalUsersCount - initialUsersCount)
-                    .divide(BigDecimal.valueOf(initialUsersCount))
-                    .multiply(BigDecimal.valueOf(100));
+//            growthPercentage = BigDecimal.valueOf(finalUsersCount - initialUsersCount)
+//                    .divide(BigDecimal.valueOf(initialUsersCount), RoundingMode.HALF_DOWN)
+//                    .multiply(BigDecimal.valueOf(100))
+//                    .setScale(2, RoundingMode.HALF_UP);  // Resultado final con 2 decimales
+
+            double difference = (double) (finalUsersCount - initialUsersCount);
+            double percentage = (difference / initialUsersCount) * 100;
+            growthPercentage = BigDecimal.valueOf(percentage).setScale(2, RoundingMode.HALF_UP);
+
         } else {
             growthPercentage = BigDecimal.ZERO;
         }
@@ -149,6 +155,12 @@ public class AdminReportServiceImpl implements AdminReportService {
                 endDateTime
         );
 
+        Integer totalMatchesRejected = matchRepository.countByCreatedAtBetweenAndStatus(
+                startDateTime,
+                endDateTime,
+                Status.REJECTED
+        );
+
         // Contar matches pendientes dentro del rango de fechas
         Integer totalPendingMatches = matchRepository.countByCreatedAtBetweenAndStatus(
                 startDateTime,
@@ -167,7 +179,7 @@ public class AdminReportServiceImpl implements AdminReportService {
         Integer totalRejectedMatches = matchRepository.countByCreatedAtBetweenAndStatus(
                 startDateTime,
                 endDateTime,
-                Status.REJECTED
+                Status.REJECTED_BY_TUTOR
         );
 
         // Mapear y contar matches por el intervalo definido
@@ -177,7 +189,7 @@ public class AdminReportServiceImpl implements AdminReportService {
         String matchesAceptados = "matchesAceptados";
         String matchesRechazados = "matchesRechazados";
 
-        reportData.put(matchesTotales, totalMatches);
+        reportData.put(matchesTotales, totalMatches - totalMatchesRejected);
         reportData.put(matchesPendientes, totalPendingMatches);
         reportData.put(matchesAceptados, totalAcceptedMatches);
         reportData.put(matchesRechazados, totalRejectedMatches);

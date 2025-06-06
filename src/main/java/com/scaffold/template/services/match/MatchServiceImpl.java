@@ -153,7 +153,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public MatchEntity acceptMatch(Long matchId, boolean isAccepted) {
         MatchEntity match = this.getMatchEntityById(matchId);
-        match.setStatus(isAccepted ? Status.ACCEPTED : Status.REJECTED);
+        match.setStatus(isAccepted ? Status.ACCEPTED : Status.REJECTED_BY_TUTOR);
         match.setUpdatedAt(LocalDateTime.now());
 
         // Create a welcome chat when the match is accepted

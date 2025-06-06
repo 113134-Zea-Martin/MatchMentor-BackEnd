@@ -24,6 +24,7 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
 
     Integer countByCreatedAtBetweenAndStatus(LocalDateTime from, LocalDateTime to, Status status);
 
+
 //    SELECT COUNT(m.tutor_id) as quantity, CONCAT(u.first_name, " ", u.last_name) as full_name FROM matches m
 //    JOIN users u ON m.tutor_id = u.id
 //    WHERE m.updated_at BETWEEN '2025-05-14' AND '2025-05-28'
