@@ -48,7 +48,7 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "/swagger-resources/**",
                                         "/webjars/**").permitAll()
-                                .requestMatchers("/api/auth/request-reset", "/api/auth/reset-password**").permitAll()
+                                .requestMatchers("/api/auth/request-reset", "/api/auth/reset-password**", "/api/payment/mercadopago/notification").permitAll()
                                 .anyRequest().authenticated()
 //                                .anyRequest().permitAll()
                 )
